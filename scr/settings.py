@@ -9,7 +9,7 @@ class Settings:
 		#Configurações gerais
 		self.screen_width = 800
 		self.screen_height = 600
-		self.game_title = "Defend the night"
+		self.game_title = "Defend the Night"
 		self.gameOver = 0
 
 		""" Fontes disponíveis
