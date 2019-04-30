@@ -1,5 +1,6 @@
 import os, sys
 import pygame
+from random import randint
 
 class Mobs(pygame.sprite.Sprite):
 
@@ -30,7 +31,7 @@ class Mobs(pygame.sprite.Sprite):
 		self.__vidaMob = self.settings.vidaMob
 
 		#Rect
-		self.rect.x = 0                              #Posição do Mob na tela, alterar para um valor aleatorio
+		self.rect.x = randint(self.settings.randomMenorPosXMob,self.settings.randomMaiorPosXMob)                              #Posição do Mob na tela, alterar para um valor aleatorio
 		self.rect.y = self.settings.posY             #Posição do Mob na tela, na divisa do chão
 		self.rect.w = self.settings.imageMob1W       #Nessessário para o rect de colisão
 		self.rect.h = self.settings.imageMob1H
@@ -44,13 +45,18 @@ class Mobs(pygame.sprite.Sprite):
 
 	def __loadVariables(self):
 		self.currentImage = self.__currentImage
-		self.velocidadeMob = self.__velocidadeMob
+		self.velocidadeMob = self.__velocidadeMob + randint(0,self.settings.randomVelocidadeMob)
 		self.contadorImage = self.__contadorImage
 		self.velocidadeImage = self.__velocidadeImage
 		self.inMoving = self.__inMoving
 
-		self.damageMob = self.__damageMob
-		self.vidaMob = self.__vidaMob
+		self.damageMob = self.__damageMob + randint(0,self.settings.randomDamageMob)
+		self.vidaMob = self.__vidaMob + randint(0,self.settings.randomLifeMob)
+
+		print ("Velocidade MOB = "+str(self.velocidadeMob))
+		print ("Dano MOB = "+str(self.damageMob))
+		print ("Vida MOB = "+str(self.vidaMob))
+		print ("Pos Mob = "+str(self.rect.x))
 
 	def resetVariables(self):
 		self.__loadVariables()

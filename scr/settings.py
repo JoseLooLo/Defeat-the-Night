@@ -54,10 +54,17 @@ class Settings:
 		self.fontTime.changeFont(self.fontNameTime, self.fontSizeTime, self.fromSystemTime)
 
 	def __loadClass(self):
+		#Aumentar em até X os valores dos status do mob
+		self.__randomVelocidadeMob = 2
+		self.__randomDamageMob = 10
+		self.__randomLifeMob = 30
+		self.__randomMenorPosXMob = -2100
+		self.__randomMaiorPosXMob = 2100
+
 		#Time
 		self.__timeDays = 1
-		self.__timeHr = 7
-		self.__timeMin = 0
+		self.__timeHr = 12
+		self.__timeMin = 00
 		self.__timeMinVelocityNight = 60
 		self.__timeMinVelocityDay = 5
 		self.__timeCounter = 0
@@ -84,6 +91,13 @@ class Settings:
 		self.__colisionDiferenceMob1 = 45     #Utilizada na colisão para maior precisão
 
 	def __loadVariables(self):
+		#Aumentar em até X os valores dos status do mob
+		self.randomVelocidadeMob = self.__randomVelocidadeMob
+		self.randomDamageMob = self.__randomDamageMob
+		self.randomLifeMob = self.__randomLifeMob
+		self.randomMenorPosXMob = self.__randomMenorPosXMob
+		self.randomMaiorPosXMob = self.__randomMaiorPosXMob
+
 		#Time
 		self.timeHr = self.__timeHr
 		self.timeMin = self.__timeMin
@@ -136,6 +150,8 @@ class Settings:
 		self.player = self.__load_Images("player.png", None, -1)
 		#Imagem dos Mobs
 		self.mob = self.__load_Images("player.png", None, -1)
+		#Imagem das armas
+		self.weapon = self.__load_Images("weapon.png",None,-1)
 
 	#NameImage = Nome da imagem com extensão
 	#NameDirectory = Nome da pasta que se encontra dentro da pasta /data/Images/

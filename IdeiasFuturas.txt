@@ -1,0 +1,5 @@
+Começa com hordas de inimigos fracos em pouco numero, e faz eles spawnarem até 2-3 mins e só vira o dia quando todos estiverem mortos, ae se possivel congela a hora
+
+Versão 2.0
+Armadilhas e barricadas
+Arvores e pedras para obter recursos

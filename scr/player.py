@@ -1,5 +1,6 @@
 import os, sys
 import pygame
+from scr.weapon import Weapon
 
 class Player(pygame.sprite.Sprite):
 
@@ -8,6 +9,7 @@ class Player(pygame.sprite.Sprite):
 		self.settings = settings
 		self.image = image
 		self.rect = image.get_rect()
+		self.weaponAtual = pygame.sprite.Group()
 
 		self.__init()
 
@@ -15,6 +17,7 @@ class Player(pygame.sprite.Sprite):
 		self.__loadClass()
 		self.__loadVariables()
 		self.__setImagensPositions()
+		self.__createWeapon()
 
 	def __loadClass(self):
 		#Variaveis importantes
@@ -37,6 +40,8 @@ class Player(pygame.sprite.Sprite):
 		self.__contadorJump = 0                        #Variavel auxiliar durante o jump
 		self.__contadorAirJump = 0                     #Variavel auxiliar durante o Air Jump
 		self.__contadorInDamage = 0                    #Variavel auxiliar durante o tempo que levar dano
+		self.__contadorWeaponDelay = 0                 #Variavel auxiliar para alterar a imagem da arma ao atacar
+		self.__contadorAtackDelay = 0                  #Variavel auxiliar para liberar o atack novamente
 
 		#Rect
 		""">>>>>>>>>>>>>>>>>>>>> ALERTA DE GAMBIARRA DO JOSÉ <<<<<<<<<<<<<<<<<<<"""
@@ -55,6 +60,8 @@ class Player(pygame.sprite.Sprite):
 		self.__inInverseJump = False      #Verifica se o jogador está caindo
 		self.__inAirJump = False          #Verifica se o jogador atigingiu a altura máxima
 		self.__inDamage = False           #Verifica se levou dano
+		self.__inAtack = False            #Verifica se está atacando
+		self.__ifHit = True              #Controla para não atacar diversas vezes seguias
 
 
 	def __loadVariables(self):
@@ -68,6 +75,8 @@ class Player(pygame.sprite.Sprite):
 		self.contadorJump = self.__contadorJump
 		self.contadorAirJump = self.__contadorAirJump
 		self.contadorInDamage = self.__contadorInDamage
+		self.contadorWeaponDelay = self.__contadorWeaponDelay
+		self.contadorAtackDelay = self.__contadorAtackDelay
 
 		self.inMoving = self.__inMoving
 		self.colisionRight = self.__colisionRight
@@ -76,13 +85,48 @@ class Player(pygame.sprite.Sprite):
 		self.inInverseJump = self.__inInverseJump
 		self.inAirJump = self.__inAirJump
 		self.inDamage = self.__inDamage
+		self.inAtack = self.__inAtack
+		self.ifHit = self.__ifHit
+
+		#Mouse
+		self.posMouseRight = True  #Cursor do mouse está do lado direito da tela | False o mouse está do lado esquerdo
 		
 
 	def resetVariables(self):
 		self.__loadVariables()
 
+	def __createWeapon(self):
+		self.weapon = Weapon(self.settings.weapon, self.settings, self, 1)
+		self.weaponAtual.add(self.weapon)
+
+	def atack(self):
+		if self.inAtack:
+			if self.contadorAtackDelay == self.weapon.weaponDelay:
+				self.inAtack = False
+				self.contadorAtackDelay = 0
+			else:                                         #Else necessário!!! Usado para dar tempo de mudar a imagem da espada
+				return
+		self.inAtack = True
+		self.ifHit = False
+		if self.weapon.contadorImageAtual == 6:
+			self.weapon.changeWeaponImageAtual(5)
+		elif self.weapon.contadorImageAtual == 3:
+			self.weapon.changeWeaponImageAtual(2)
+		print ("ATACK")
+
 	def draw(self, background):
+		if self.weapon.contadorImageAtual == 5 or self.weapon.contadorImageAtual == 2:
+			if not self.posMouseRight:
+				background.blit(self.weapon.weaponAtual,(self.rect.x-10,self.rect.y+25))
+			else:
+				background.blit(self.weapon.weaponAtual,(self.rect.x+self.rect.w/2+10,self.rect.y+25))
+		else:
+			if not self.posMouseRight:
+				background.blit(self.weapon.weaponAtual,(self.rect.x,self.rect.y+20))
+			else:
+				background.blit(self.weapon.weaponAtual,(self.rect.x+self.rect.w/2,self.rect.y+20))
 		background.blit(self.image, (self.rect.x, self.rect.y), (self.__vectorPosX[self.currentImage],self.__vectorPosY[self.currentImage],96,96))
+
 
 	def __setImagensPositions(self):
 		self.__vectorPosX[0] = 0
@@ -102,13 +146,16 @@ class Player(pygame.sprite.Sprite):
 		self.__vectorPosY[6] = 0
 
 	def update(self):
+		self.__updateMousePosition()
 		self.__contadores()                  #Atualiza contadores importantes
 		if self.inMoving:
 			if self.__verificaExtremos():    #Se o personagem não está nos extremos entra no if
 				self.__step()                #Move o personagem
-				self.__updateCurrentImage()  #Altera a imagem do personagem se movendo
 		if self.inJump:
 			self.__jump()                    #Pula
+
+		self.__updateCurrentImage()  #Altera a imagem do personagem se movendo
+		self.__updateCurrentWeaponImage()
 
 	def __step(self):
 		if self.velocidadeJogador < 0 and not self.colisionLeft:    #Verifica se o jogador está se movendo para a esquerda e se não está colidindo pela esquerda
@@ -119,13 +166,42 @@ class Player(pygame.sprite.Sprite):
 	def colisionMob(self, mob):
 		if self.inJump:                   #Se está pulando não faz a checagem de colisão
 			mob.inMoving = True           #Faz o mob voltar a se mover
-			self.__removeColision(mob)    #Remove as colisoes
+			self.removeColision()    #Remove as colisoes
 			return
 		self.__checkColision(mob)
+		
+	def colisionWeapon(self,mob):
+		self.__checkColisionAtack(mob)
 
-	def __removeColision(self, mob):
+	def removeColision(self):
 		self.colisionLeft = False
 		self.colisionRight = False
+
+	def __checkColisionAtack(self, mob):
+		self.tempMobRect = mob.rect.copy()
+		self.tempWeaponRect = self.weapon.rect.copy()
+		if not self.posMouseRight:
+			self.tempMobRect.x -= self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
+			self.tempMobRect.x += self.weapon.rect.w
+			self.tempWeaponRect.x = self.rect.x+30
+			self.tempWeaponRect.y = self.rect.y+25
+			if self.tempWeaponRect.colliderect(self.tempMobRect) and mob.velocidadeMob > 0:             #Verifica a colisão entre o player e o rect
+				print("Vida atual do mob "+ str(mob.vidaMob))
+				print (self.tempWeaponRect)
+				print (self.tempMobRect)
+				self.ifHit = True
+				mob.vidaMob -= (self.damageJogador + self.weapon.weaponDamage)
+		else:
+			self.tempMobRect.x += self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
+			self.tempMobRect.x -= self.weapon.rect.w+30
+			self.tempWeaponRect.x = self.rect.x+self.rect.w/2-50
+			self.tempWeaponRect.y = self.rect.y+25
+			if self.tempMobRect.colliderect(self.tempWeaponRect) and mob.velocidadeMob < 0:                #Verifica a colisão entre o mod e o player
+				print("Vida atual do mob "+ str(mob.vidaMob))
+				print (self.tempWeaponRect)
+				print (self.tempMobRect)
+				self.ifHit = True
+				mob.vidaMob -= (self.damageJogador + self.weapon.weaponDamage)
 
 	def __checkColision(self, mob):
 		self.tempMobRect = mob.rect.copy()
@@ -159,8 +235,43 @@ class Player(pygame.sprite.Sprite):
 			return False
 		return True    #Se não está no limite retorna True, caso contrario retorna False
 
+	def __updateMousePosition(self):
+		#Muda a variavel de controle para verificar a posição do mouse na tela
+		metadeTelaX = int(self.rect.x + self.rect.w/2)
+		#pygame.mouse.get_pos()[0] pega a posição X do cursor do mouse atual
+		if pygame.mouse.get_pos()[0] > metadeTelaX:
+			self.posMouseRight = True
+		else:
+			self.posMouseRight = False
+
+	def __updateCurrentWeaponImage(self):
+		if self.inAtack:
+			if self.posMouseRight and self.weapon.contadorImageAtual < 4:
+				self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual+3)
+			elif not self.posMouseRight and self.weapon.contadorImageAtual > 3:
+				self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual-3)
+			if self.contadorWeaponDelay == self.weapon.weaponImageDelay:
+				self.contadorWeaponDelay = 0
+				if self.weapon.contadorImageAtual == 5 or self.weapon.contadorImageAtual == 2:
+					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual+1)
+		else:
+			if self.posMouseRight:
+				if self.weapon.contadorImageAtual < 4:
+					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual+3)
+			else:
+				if self.weapon.contadorImageAtual > 3:
+					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual-3)
+
 	def __updateCurrentImage(self):
-		if self.velocidadeJogador < 0:  #Caso esteja se movendo para a esquerda
+		if not self.inMoving:   #Caso não esteja se movendo apenas muda a imagem para seu reflexo
+			if not self.posMouseRight and self.currentImage > 2:
+				self.currentImage -= 3
+			elif self.posMouseRight and self.currentImage < 3:
+				self.currentImage += 3
+			return
+
+		#Caso esteja se movendo...
+		if not self.posMouseRight:  #Caso o mouse esteja do lado direito da tela
 			if self.currentImage == 6: #Caso ele esteja no extremo oposto faz ele voltar a imagem inicial de movimento
 				self.currentImage = 0
 				return
@@ -178,7 +289,7 @@ class Player(pygame.sprite.Sprite):
 			else:
 				self.currentImage = 0
 				self.contadorImage = 0
-		elif self.velocidadeJogador > 0:   #Caso esteja se movendo para a direita
+		else:   #Caso o mouse esteja do lado esquerdo da tela
 			if self.currentImage == 6:     #Caso ele esteja no extremo oposto faz ele voltar a imagem inicial de movimento
 				self.currentImage = 3
 				return
@@ -219,6 +330,10 @@ class Player(pygame.sprite.Sprite):
 		#Atualiza contadores que dependem do jogo rodar e não de outras variaveis externas
 		if self.contadorInDamage < self.__imunityTime:
 			self.contadorInDamage += 1
+		if self.contadorAtackDelay < self.weapon.weaponDelay:
+			self.contadorAtackDelay += 1
+		if self.contadorWeaponDelay < self.weapon.weaponImageDelay:
+			self.contadorWeaponDelay += 1
 
 	def __setDamage(self, damage):
 		if self.inDamage:                       #Se já levou dano e está no tempo de invunerabilidade

@@ -2,6 +2,7 @@ import os, sys
 import pygame
 from scr.player import Player
 from scr.mobs import Mobs
+from random import randint
 
 class Game:
 
@@ -20,6 +21,8 @@ class Game:
 		self.background.fill(self.settings.color_white)
 		self.background.blit(self.settings.image_background, (0,0), (self.settings.posX, 0, self.settings.screen_width, self.settings.screen_height))
 
+		self.listaMobs = pygame.sprite.Group()
+
 		self.__createSprites()              #Cria os objetos de personagem e mobs
 		self.__createText()                 #Cria os textos que irão aparecer na tela
 		self.clock = pygame.time.Clock()
@@ -35,11 +38,27 @@ class Game:
 			self.clock.tick(60)              #FPS counter
 		pygame.display.flip()
 
+	
+	def __createMobs(self):
+		for _ in range(0,randint(1,self.settings.timeDays*2 + 1)):
+			mobs = Mobs(self.settings.mob, self.settings, self.player)
+			self.listaMobs.add(mobs)
+
+	def __destroyMobs(self):
+		self.listaMobs.clear()
 
 	def __checkColision(self):
-		self.player.colisionMob(self.mobs)
-		#self.player.colisionMob(self.mobs2)
-
+		#Check for atack
+		if not self.player.ifHit:
+			for mob in self.listaMobs.sprites():
+				self.player.colisionWeapon(mob)
+				if mob.vidaMob <= 0:
+					self.listaMobs.remove(mob) 
+					self.player.removeColision()
+					del mob
+		for mob in self.listaMobs.sprites():
+			self.player.colisionMob(mob)
+			
 	def __updateTime(self):
 		if self.settings.timeCounter == self.settings.timeMinVelocity:   #Passou 1 min
 			self.settings.timeCounter = 0
@@ -50,6 +69,10 @@ class Game:
 					self.settings.timeDays += 1
 				else:
 					self.settings.timeHr += 1
+					if self.settings.timeHr == 16:
+						self.__createMobs()
+					elif self.settings.timeHr == 8:
+						self.__destroyMobs()
 				#Altera a velocidade do dia ou da noite
 				if self.settings.timeHr > 7 and self.settings.timeHr < 16:
 					self.settings.timeMinVelocity = self.settings.timeMinVelocityDay
@@ -63,6 +86,8 @@ class Game:
 	def __checkEvents(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT: sys.exit()
+			if event.type == pygame.MOUSEBUTTONUP:
+				self.player.atack()
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_d:
 					self.player.inMoving = False
@@ -93,6 +118,7 @@ class Game:
 		if self.settings.timeMin < 10:
 			Min = "0"+Min
 		self.textTime = self.settings.fontTime.font.render(Hr+":"+Min,1,self.settings.color_yellow)
+		self.textDay = self.settings.fontTime.font.render("DAY "+str(self.settings.timeDays),1,self.settings.color_red)
 		self.textPosX = self.settings.font.font.render(str(self.settings.posX),1,(10,10,10))
 		self.textPosY = self.settings.font.font.render(str(self.player.rect.y),1,(10,10,10))
 		self.textVelocidadeJogador = self.settings.font.font.render("Speed  "+str(self.player.velocidadeJogador),1,(10,10,10))
@@ -101,19 +127,19 @@ class Game:
 
 	def __update(self):
 		self.player.update()
-		self.mobs.update()
-		#self.mobs2.update()
+		self.listaMobs.update()  #Faz update em todos os mobs existentes
 		pygame.display.update()
 
 	def __draw(self):
 		self.screen.blit(self.background, (0,0))
 		self.background.blit(self.settings.image_background, (0,0), (self.settings.posX,0,self.settings.screen_width,self.settings.screen_height))
 		self.player.draw(self.background)
-		self.mobs.draw(self.background)
-		#self.mobs2.draw(self.background)
+		for mob in self.listaMobs.sprites():
+			mob.draw(self.background)
 
 	def __drawText(self):
-		self.background.blit(self.textTime,(self.settings.screen_width/2 -35,75))
+		self.background.blit(self.textDay, (self.settings.screen_width/2 -self.player.rect.w/2,30))
+		self.background.blit(self.textTime,(self.settings.screen_width/2 -self.player.rect.w/2,75))
 		if self.showInformationsGame:
 			self.background.blit(self.textPosX,(0,0))
 			self.background.blit(self.textPosY,(0,25))
@@ -124,8 +150,6 @@ class Game:
 
 	def __createSprites(self):
 		self.player = Player(self.settings.player, self.settings)
-		self.mobs = Mobs(self.settings.mob, self.settings, self.player)
-		#self.mobs2 = Mobs(self.settings.mob, self.settings, self.player)
 
 	def __createText(self):
 		#Time
@@ -136,6 +160,7 @@ class Game:
 		if self.settings.timeMin < 10:
 			Min = "0"+Min
 		self.textTime = self.settings.fontTime.font.render(Hr+":"+Min,1,self.settings.color_yellow)
+		self.textDay = self.settings.fontTime.font.render("DAY "+str(self.settings.timeDays),1,self.settings.color_red)
 		self.textPosX = self.settings.font.font.render(str(self.settings.posX),1,(10,10,10))
 		self.textPosY = self.settings.font.font.render(str(self.player.rect.y),1,(10,10,10))
 		self.textVelocidadeJogador = self.settings.font.font.render("Speed  "+str(self.player.velocidadeJogador),1,(10,10,10))
