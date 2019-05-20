@@ -112,6 +112,7 @@ class Player(pygame.sprite.Sprite):
 			self.weapon.changeWeaponImageAtual(5)
 		elif self.weapon.contadorImageAtual == 3:
 			self.weapon.changeWeaponImageAtual(2)
+		#self.weapon.changeWeapon()
 		print ("ATACK")
 
 	def draw(self, background):
@@ -190,6 +191,7 @@ class Player(pygame.sprite.Sprite):
 				print (self.tempWeaponRect)
 				print (self.tempMobRect)
 				self.ifHit = True
+				mob.rect.x -= self.weapon.weaponKnockBack
 				mob.vidaMob -= (self.damageJogador + self.weapon.weaponDamage)
 		else:
 			self.tempMobRect.x += self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
@@ -201,6 +203,7 @@ class Player(pygame.sprite.Sprite):
 				print (self.tempWeaponRect)
 				print (self.tempMobRect)
 				self.ifHit = True
+				mob.rect.x += self.weapon.weaponKnockBack
 				mob.vidaMob -= (self.damageJogador + self.weapon.weaponDamage)
 
 	def __checkColision(self, mob):

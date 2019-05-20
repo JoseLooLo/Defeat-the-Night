@@ -21,7 +21,7 @@ class Settings:
 
 		#Fonte geral
 		self.font = Font()
-		self.fontName = "VCR_OSD_MONO_1.001.ttf"
+		self.fontName = "lunchds.ttf"
 		self.fontSize = 25
 		self.fromSystem = False
 
@@ -63,9 +63,9 @@ class Settings:
 
 		#Time
 		self.__timeDays = 1
-		self.__timeHr = 12
-		self.__timeMin = 00
-		self.__timeMinVelocityNight = 60
+		self.__timeHr = 7
+		self.__timeMin = 20
+		self.__timeMinVelocityNight = 10
 		self.__timeMinVelocityDay = 5
 		self.__timeCounter = 0
 
@@ -133,7 +133,7 @@ class Settings:
 		""">>>>>>>>>>>>>>>> IMPORTANTE <<<<<<<<<<<<<<<<<<<
 		SEMPRE CHAME ESSE MÉTODO DEPOIS DA SCREEN TER SIDO CRIADA
 		"""
-		self.image_background = self.__load_Images(self.__backgroundImageName, self.__backgroundPathName)
+		self.image_background = self.load_Images(self.__backgroundImageName, self.__backgroundPathName)
 		#Variaveis de controle da posição do personagem na tela
 		"""MUITO IMPORTANTE"""
 		self.__posX = int((self.image_background.get_size()[0] - self.screen_width)/2)  #PosX da metade do background
@@ -147,16 +147,16 @@ class Settings:
 
 	def loadDefaultImages(self):
 		#Imagem do Player
-		self.player = self.__load_Images("player.png", None, -1)
+		self.player = self.load_Images("player.png", None, -1)
 		#Imagem dos Mobs
-		self.mob = self.__load_Images("player.png", None, -1)
+		self.mob = self.load_Images("player.png", None, -1)
 		#Imagem das armas
-		self.weapon = self.__load_Images("weapon.png",None,-1)
+		self.weapon = self.load_Images("weapon.png",None,-1)
 
 	#NameImage = Nome da imagem com extensão
 	#NameDirectory = Nome da pasta que se encontra dentro da pasta /data/Images/
 	#ColorKey = Cor a tornar transparente na imagem
-	def __load_Images(self, nameImage, nameDirectory=None, colorkey=None):
+	def load_Images(self, nameImage, nameDirectory=None, colorkey=None):
 		fullname = os.path.join('data','Images')
 		if nameDirectory is not None:
 			fullname = os.path.join(fullname, nameDirectory)

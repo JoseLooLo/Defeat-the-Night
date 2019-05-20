@@ -26,6 +26,7 @@ class Weapon(pygame.sprite.Sprite):
         self.__velocityImageChange = 5
         self.__weaponDelay = 20
         self.__weaponImageDelay = 40
+        self.__weaponKnockBack = 40
         
         self.__inCombate = False
 
@@ -35,10 +36,24 @@ class Weapon(pygame.sprite.Sprite):
         self.velocityImageChange = self.__velocityImageChange
         self.weaponDelay = self.__weaponDelay
         self.weaponImageDelay = self.__weaponImageDelay
+        self.weaponKnockBack = self.__weaponKnockBack
+
+    def changeWeapon(self):
+        if self.weaponID == 12:
+            self.weaponID = 1
+        self.weaponID+=1
+        self.__setImagensPositions()
+        self.__createImages()
 
     def __setImagensPositions(self):
-        linha = randint(0,5)
-        coluna = randint(1,2)
+        linha = 0
+        coluna = 0
+        if self.weaponID > 6:
+            linha = self.weaponID-7
+            coluna = 2
+        else:
+            linha = self.weaponID-1
+            coluna = 1
         if coluna == 1:
             self.__weaponPosX[0] = 42
             self.__weaponPosX[1] = 95
