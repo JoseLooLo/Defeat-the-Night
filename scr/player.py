@@ -77,6 +77,7 @@ class Player(pygame.sprite.Sprite):
 		self.contadorInDamage = self.__contadorInDamage
 		self.contadorWeaponDelay = self.__contadorWeaponDelay
 		self.contadorAtackDelay = self.__contadorAtackDelay
+		self.money = 0
 
 		self.inMoving = self.__inMoving
 		self.colisionRight = self.__colisionRight
@@ -206,13 +207,13 @@ class Player(pygame.sprite.Sprite):
 
 	def __checkColision(self, mob):
 		self.tempMobRect = mob.getRectMob().copy()
-		print ("Xplayer = %d Xmob = %d Yplayer = %d Ymob = %d" %(self.rect.x, self.tempMobRect.x, self.rect.y, self.tempMobRect.y))
+		#print ("Xplayer = %d Xmob = %d Yplayer = %d Ymob = %d" %(self.rect.x, self.tempMobRect.x, self.rect.y, self.tempMobRect.y))
 		if mob.mobVelocity > 0:
 			if self.rect.colliderect(self.tempMobRect):                #Verifica a colisão entre o player e o rect
 				self.__setDamage(mob.mobDamage)
 				mob.inMoving = False
 				self.colisionLeft = True
-				print ("Left")
+				#print ("Left")
 			elif not mob.inMoving:
 				self.colisionLeft = False
 				mob.inMoving = True
@@ -221,7 +222,7 @@ class Player(pygame.sprite.Sprite):
 				self.__setDamage(mob.mobDamage)
 				mob.inMoving = False
 				self.colisionRight = True
-				print ("Right")
+				#print ("Right")
 			elif not mob.inMoving:
 				self.colisionRight = False
 				mob.inMoving = True

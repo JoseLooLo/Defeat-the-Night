@@ -23,6 +23,7 @@ class Settings:
 		self.color_white = (255,255,255)
 		self.color_red = (255,0,0)
 		self.color_yellow = (238,255,8)
+		self.color_green = (2,164,0)
 
 		self.generalInfo = True
 		self.valuePosY = 470             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
@@ -47,13 +48,13 @@ class Settings:
 		self.fontTime = Font("CHARRED ZARD.ttf", False, 60)
 
 	def __loadVariables(self):
-		self.__loadDefaultPlayerVariables()
-		#self.__loadDefaultMobVariables()
+		self.__loadPlayerVariables()
 		self.__loadMobVariables()
-		self.__loadDefaultTimeVariables()
+		self.__loadTimeVariables()
 		self.__loadNPCVariables()
+		self.__loadMoneyVariables()
 
-	def __loadDefaultPlayerVariables(self):
+	def __loadPlayerVariables(self):
 		#Status padrão Jogador
 		self.velocityPlayer = 5          #Velocidade de movimento inicial do player
 		self.damagePlayer = 5            #Dano inicial do player
@@ -70,6 +71,7 @@ class Settings:
 		self.mobName = []
 		self.mobQntImages = []
 		self.mobVelocityImages = []
+		self.mobMoneyDrop = []
 		self.mobStatusDamage = []
 		self.mobStatusVelocity = []
 		self.mobStatusLife = []
@@ -85,6 +87,9 @@ class Settings:
 
 		#Velocidade de troca de frame
 		self.mobVelocityImages.append(7)
+
+		#Quantidade de moedas que dropam ao matar
+		self.mobMoneyDrop.append(2)
 
 		#Status dos mobs
 		self.mobStatusDamage.append(1)
@@ -133,7 +138,7 @@ class Settings:
 	def getMobVelocityImages(self, mobID):
 		return self.mobVelocityImages[mobID]
 
-	def __loadDefaultTimeVariables(self):
+	def __loadTimeVariables(self):
 		#Time
 		#Define qual hora irá iniciar o dia e a noite
 		self.timeInitDay = 7
@@ -191,6 +196,30 @@ class Settings:
 
 	def getNPCVelocityImages(self, npcID):
 		return self.npcVelocityImages[npcID]
+
+	def __loadMoneyVariables(self):
+		self.moneyQntImages = []
+		self.moneyVelocityImages = []
+		self.moneyZoom = []
+
+		#Qnt imagens das moedas
+		self.moneyQntImages.append(6)
+		
+		#Velocidade de troca de frame
+		self.moneyVelocityImages.append(10)
+
+		#Tamanho da moeda
+		#2 = 2x menor  || 1 = Tamanho normal
+		self.moneyZoom.append(2)
+
+	def getMoneyQntImages(self, moneyID):
+		return self.moneyQntImages[moneyID]
+	
+	def getMoneyVelocityImages(self, moneyID):
+		return self.moneyVelocityImages[moneyID]
+
+	def getMoneyZoom(self, moneyID):
+		return self.moneyZoom[moneyID]
 
 	def loadBackground(self):
 		#Inicialmente o background iria ser iniciado no __init__ pois é algo fixo

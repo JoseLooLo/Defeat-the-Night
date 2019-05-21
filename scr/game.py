@@ -3,6 +3,7 @@ import pygame
 from scr.player import Player
 from scr.mobs import Mobs
 from scr.npc import Npc
+from scr.money import Money
 from random import randint
 
 class Game:
@@ -25,6 +26,7 @@ class Game:
 		#Cria os grupos de sprites
 		self.listMobs = pygame.sprite.Group()
 		self.listNPC = pygame.sprite.Group()
+		self.listMoney = pygame.sprite.Group()
 
 		#Inicializa objetos e textos
 		self.__createSprites()              #Cria os objetos de personagem e mobs
@@ -89,6 +91,14 @@ class Game:
 		self.__checkColisionPlayerNPC()    #Checa a colisão entre player e NPC
 		self.__checkColisionWeaponMob()    #Checa a colisão entre a arma e o MOB
 		self.__checkColisionPlayerMob()    #Checa a colisão entre Player e mob
+		self.__checkColisionPlayerMoney()  #Checa a colisão entre Player e Money
+
+	def __checkColisionPlayerMoney(self):
+		for money in self.listMoney.sprites():
+			if money.checkColisionPlayer(self.player):
+				self.player.money += money.value
+				self.listMoney.remove(money)
+				del money
 
 	def __checkColisionPlayerNPC(self):
 		for npc in self.listNPC.sprites():
@@ -99,6 +109,7 @@ class Game:
 			for mob in self.listMobs.sprites():
 				self.player.colisionWeapon(mob)
 				if mob.mobLife <= 0:
+					self.__createMoney(0,self.settings.posX+mob.getRectMob().x+mob.getRectMob().w/2,1)
 					self.listMobs.remove(mob) 
 					self.player.removeColision()
 					del mob
@@ -176,11 +187,13 @@ class Game:
 		self.textVelocidadeJogador = self.settings.fontGeneral.font.render(str(abs(self.player.velocidadeJogador)),1,(10,10,10))
 		self.textDamageJogador = self.settings.fontGeneral.font.render    (str(self.player.damageJogador),1,(10,10,10))
 		self.textVidaJogador = self.settings.fontGeneral.font.render      (str(self.player.vidaJogador),1,self.settings.color_red)
+		self.textMoneyJogador = self.settings.fontGeneral.font.render      (str(self.player.money),1,self.settings.color_green)
 
 	def __updateObject(self):
 		self.player.update()    #Faz update no player
 		self.listNPC.update()   #Faz update em todos os NPCS existentes
 		self.listMobs.update()  #Faz update em todos os mobs existentes
+		self.listMoney.update() #Faz update em todos os dinheiros dropados
 
 	def __update(self):
 		self.__updateObject()
@@ -200,6 +213,9 @@ class Game:
 		#NPC fica no fundo do background
 		for npc in self.listNPC.sprites():
 			npc.draw(self.background)
+		#Em seguida do money
+		for money in self.listMoney.sprites():
+			money.draw(self.background)
 		#Em seguida dos mobs
 		for mob in self.listMobs.sprites():
 			mob.draw(self.background)
@@ -223,7 +239,7 @@ class Game:
 			self.background.blit(self.textVelocidadeJogador, (50, self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+27))
 
 			self.background.blit(self.__iconMoney,(8,self.__iconMoney.get_rect().h+self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+30))
-			self.background.blit(self.textVelocidadeJogador, (50,self.__iconMoney.get_rect().h+ self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+37))
+			self.background.blit(self.textMoneyJogador, (50,self.__iconMoney.get_rect().h+ self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+37))
 			
 
 	def __createSprites(self):
@@ -243,6 +259,10 @@ class Game:
 		self.listNPC.add(self.npcAdolfinho)
 		self.listNPC.add(self.npcRogerio)
 
+	def __createMoney(self, moneyID, posXDrop, value = 0):
+		money = Money(self.settings, moneyID, posXDrop,value)
+		self.listMoney.add(money)
+
 	def __createText(self):
 		#Time
 		Hr = str(self.settings.timeHr)
@@ -258,6 +278,7 @@ class Game:
 		self.textVelocidadeJogador = self.settings.fontGeneral.font.render(str(abs(self.player.velocidadeJogador)),1,(10,10,10))
 		self.textDamageJogador = self.settings.fontGeneral.font.render    (str(self.player.damageJogador),1,(10,10,10))
 		self.textVidaJogador = self.settings.fontGeneral.font.render      (str(self.player.vidaJogador),1,self.settings.color_red)
+		self.textMoneyJogador = self.settings.fontGeneral.font.render      (str(self.player.money),1,self.settings.color_green)
 		self.__iconHP = self.settings.load_Images("Heart.png", "HUD/HUD", -1)
 		self.__iconDamage = self.settings.load_Images("Damage.png", "HUD/HUD", -1)
 		self.__iconVelocity = self.settings.load_Images("Speed.png", "HUD/HUD", -1)
