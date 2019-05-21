@@ -55,6 +55,7 @@ class Mobs(pygame.sprite.Sprite):
 	def getRectMob(self):
 		tempRect = self.__rectMob.copy()
 		tempRect.x = self.currentMobPosX
+		tempRect.y = 380
 		return tempRect
 
 	#Como o mob pode se mover para a direita ou esquerda, segue que a prox imagem pode ser de A para B quando de B para A
@@ -78,40 +79,27 @@ class Mobs(pygame.sprite.Sprite):
 	def draw(self, background):
 		background.blit(self.__currentImageMob, (self.currentMobPosX, self.settings.valuePosY-self.__rectMob.h))
 
-	def __step(self):
-		if self.inMoving:
-			self.currentMobPosX += self.mobVelocity     #Move o Mob
-			#Verifica se o player está se movendo na mesma do mob ou na direção oposta
-			#Se estiver se movendo na mesma direção afasta o mob, caso contrario aproxima
-			if self.player.inMoving:
-				if self.player.colisionRight and self.player.velocidadeJogador > 0 or self.player.colisionLeft and self.player.velocidadeJogador < 0:
-					pass
-				else:
-					if not self.player.velocidadeJogador > 0 and self.mobVelocity > 0:
-						self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
-					elif self.player.velocidadeJogador < 0 and self.mobVelocity < 0:
-						self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
-					else:
-						self.currentMobPosX += self.player.velocidadeJogador*-1      #Aproxima os dois
-
-		else:  #Se o mob não está se movendo
-			#Afasta o mob caso o player se mova para o lado oposto
-			#Perceba que o mob voltara a andar pois ao mudar o rect, ao passar pela função de colisão os dois não estarão mais em contato e o mob voltará a se mover
-			if self.player.inMoving:
-				if self.mobVelocity > 0 and self.player.velocidadeJogador > 0:
-					self.currentMobPosX -= self.player.velocidadeJogador
-				elif self.mobVelocity < 0 and self.player.velocidadeJogador < 0:
-					self.currentMobPosX -= self.player.velocidadeJogador
-
 	def update(self):
 		#Mob sempre muda a imagem de se movendo, mesmo quando esta atacando
 		self.__updateMobImage()
 		self.__step()
-		#self.currentMobPosX += self.mobVelocity
-		#self.__updateVelocity()
-		#self.__step()
-		if self.inMoving:     #Se estiver se movendo
-			self.__updateVelocity()
+		self.__updateVelocity()
+
+	def __step(self):
+		"""Aqui tem um bug que o slime fica indo de um lado para o outro se está sobre o player"""
+		if self.inMoving:
+			self.currentMobPosX += self.mobVelocity
+		"""Arrumo depois"""
+		if self.player.inMoving:
+			if self.player.colisionRight and self.player.velocidadeJogador > 0 or self.player.colisionLeft and self.player.velocidadeJogador < 0:
+				pass
+			else:
+				if not self.player.velocidadeJogador > 0 and self.mobVelocity > 0:
+					self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
+				elif self.player.velocidadeJogador < 0 and self.mobVelocity < 0:
+					self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
+				else:
+					self.currentMobPosX += self.player.velocidadeJogador*-1      #Aproxima os dois
 
 	def __updateMobImage(self):
 		self.countImageMob += 1

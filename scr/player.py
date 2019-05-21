@@ -185,40 +185,43 @@ class Player(pygame.sprite.Sprite):
 			self.tempMobRect.x += self.weapon.rect.w
 			self.tempWeaponRect.x = self.rect.x+30
 			self.tempWeaponRect.y = self.rect.y+25
-			if self.tempWeaponRect.colliderect(self.tempMobRect) and mob.velocidadeMob > 0:             #Verifica a colisão entre o player e o rect
-				print("Vida atual do mob "+ str(mob.vidaMob))
+			if self.tempWeaponRect.colliderect(self.tempMobRect) and mob.mobVelocity > 0:             #Verifica a colisão entre o player e o rect
+				print("Vida atual do mob "+ str(mob.mobLife))
 				print (self.tempWeaponRect)
 				print (self.tempMobRect)
 				self.ifHit = True
-				mob.currentMobPosX.x -= self.weapon.weaponKnockBack
+				mob.currentMobPosX -= self.weapon.weaponKnockBack
 				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
 		else:
 			self.tempMobRect.x -= self.weapon.rect.w+30
 			self.tempWeaponRect.x = self.rect.x+self.rect.w/2-50
 			self.tempWeaponRect.y = self.rect.y+25
-			if self.tempMobRect.colliderect(self.tempWeaponRect) and mob.velocidadeMob < 0:                #Verifica a colisão entre o mod e o player
-				print("Vida atual do mob "+ str(mob.vidaMob))
+			if self.tempMobRect.colliderect(self.tempWeaponRect) and mob.mobVelocity < 0:                #Verifica a colisão entre o mod e o player
+				print("Vida atual do mob "+ str(mob.mobLife))
 				print (self.tempWeaponRect)
 				print (self.tempMobRect)
 				self.ifHit = True
-				mob.currentMobPosX.x += self.weapon.weaponKnockBack
+				mob.currentMobPosX += self.weapon.weaponKnockBack
 				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
 
 	def __checkColision(self, mob):
 		self.tempMobRect = mob.getRectMob().copy()
+		print ("Xplayer = %d Xmob = %d Yplayer = %d Ymob = %d" %(self.rect.x, self.tempMobRect.x, self.rect.y, self.tempMobRect.y))
 		if mob.mobVelocity > 0:
 			if self.rect.colliderect(self.tempMobRect):                #Verifica a colisão entre o player e o rect
-				self.__setDamage(mob.damageMob)
+				self.__setDamage(mob.mobDamage)
 				mob.inMoving = False
 				self.colisionLeft = True
+				print ("Left")
 			elif not mob.inMoving:
 				self.colisionLeft = False
 				mob.inMoving = True
 		elif mob.mobVelocity < 0:
 			if self.tempMobRect.colliderect(self.rect):                #Verifica a colisão entre o mod e o player
-				self.__setDamage(mob.damageMob)
+				self.__setDamage(mob.mobDamage)
 				mob.inMoving = False
 				self.colisionRight = True
+				print ("Right")
 			elif not mob.inMoving:
 				self.colisionRight = False
 				mob.inMoving = True
