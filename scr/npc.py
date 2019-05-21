@@ -101,11 +101,11 @@ class Npc(pygame.sprite.Sprite):
             background.blit(self.__currentImageW, (self.settings.getNPCPosX(self.npcID)-self.settings.posX + (self.__rectNPC.w/2 - self.__rectW.w/2),310))
 
     def sell(self, player):
-        if self.npcID == 1:
+        if self.npcID == 0:
             player.weapon.changeWeapon()
-        elif self.npcID == 2:
+        elif self.npcID == 1:
             player.vidaJogador += 5
-        elif self.npcID == 3:
+        elif self.npcID == 2:
             if player.velocidadeJogador > 0:
                 player.velocidadeJogador += 1
             else:
