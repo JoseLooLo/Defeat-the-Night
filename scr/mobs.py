@@ -4,141 +4,124 @@ from random import randint
 
 class Mobs(pygame.sprite.Sprite):
 
-	def __init__(self, image, settings, player):
+	def __init__(self, settings, player, mobID):
 		pygame.sprite.Sprite.__init__(self)
 		self.settings = settings
 		self.player = player
-		self.image = image
-		self.rect = image.get_rect()
-		
+		self.mobID = mobID
+
 		self.__init()
 
 	def __init(self):
-		self.__loadClass()
 		self.__loadVariables()
-		self.__setImagensPositions()
-
-	def __loadClass(self):
-		#Variaveis Importantes
-		self.__qntImage = 6                          #Quantiade de subimagens possui a imagem
-		self.__vectorPosX = [0]*self.__qntImage      #Vetor com a posição X da subimagem dentro da imagem
-		self.__vectorPosY = [0]*self.__qntImage      #Não possui copia no loadVariables pois não precisa ser resetado
-		self.__currentImage = 0                      #Imagem atual
-
-		#Status mob
-		self.__velocidadeMob = self.settings.velocidadeMob
-		self.__damageMob = self.settings.damageMob
-		self.__vidaMob = self.settings.vidaMob
-
-		#Rect
-		self.rect.x = randint(self.settings.randomMenorPosXMob,self.settings.randomMaiorPosXMob)                              #Posição do Mob na tela, alterar para um valor aleatorio
-		self.rect.y = self.settings.posY             #Posição do Mob na tela, na divisa do chão
-		self.rect.w = self.settings.imageMob1W       #Nessessário para o rect de colisão
-		self.rect.h = self.settings.imageMob1H
-
-		#Contadores
-		self.__contadorImage = 0
-		self.__velocidadeImage = 6
-
-		#Variaveis de controle
-		self.__inMoving = True                       #Verifica se o Mob está se movendo
+		self.__loadImages()
 
 	def __loadVariables(self):
-		self.currentImage = self.__currentImage
-		self.velocidadeMob = self.__velocidadeMob + randint(0,self.settings.randomVelocidadeMob)
-		self.contadorImage = self.__contadorImage
-		self.velocidadeImage = self.__velocidadeImage
-		self.inMoving = self.__inMoving
+		#Variaveis de controle dos Frames
+		self.qntImageMob = self.settings.getMobQntImages(self.mobID)
+		self.numCurrentImageMob = 0
+		self.countImageMob = 0
+		self.velocityImageMob = self.settings.getMobVelocityImages(self.mobID)
 
-		self.damageMob = self.__damageMob + randint(0,self.settings.randomDamageMob)
-		self.vidaMob = self.__vidaMob + randint(0,self.settings.randomLifeMob)
+		#Variaveis de status
+		self.mobDamage = self.settings.getMobStatusDamage(self.mobID) + randint(0,self.settings.getMobStatusDamageLimit(self.mobID))
+		self.mobVelocity = self.settings.getMobStatusVelocity(self.mobID) + randint(0, self.settings.getMobStatusVelocityLimit(self.mobID))
+		self.mobLife = self.settings.getMobStatusLife(self.mobID) + randint(0, self.settings.getMobStatusLifeLimit(self.mobID))
 
-		print ("Velocidade MOB = "+str(self.velocidadeMob))
-		print ("Dano MOB = "+str(self.damageMob))
-		print ("Vida MOB = "+str(self.vidaMob))
-		print ("Pos Mob = "+str(self.rect.x))
+		#Variaveis de controle
+		self.inMoving = True
+		self.currentMobPosX = -100
+
+		if self.settings.generalInfo:
+			print ("Mob ID = "+str(self.mobID))
+			print ("Velocidade MOB = "+str(self.mobVelocity))
+			print ("Dano MOB = "+str(self.mobDamage))
+			print ("Vida MOB = "+str(self.mobLife))
+
+	def __loadImages(self):
+		self.__imageMob = []
+		for i in range(self.qntImageMob):
+			tempImage = self.settings.load_Images(str(i)+".png", "Monstros/ID"+str(self.mobID), -1)
+			self.__imageMob.append(tempImage)
+		
+		self.__currentImageMob = self.__imageMob[0]
+		self.__rectMob = self.__currentImageMob.get_rect()
+
+	def __setImageMob(self, numImg):
+		self.__currentImageMob = self.__imageMob[numImg]
+		self.numCurrentImageMob = numImg
+		self.__rectMob = self.__currentImageMob.get_rect()
+
+	def getRectMob(self):
+		tempRect = self.__rectMob.copy()
+		tempRect.x = self.currentMobPosX
+		return tempRect
+
+	#Como o mob pode se mover para a direita ou esquerda, segue que a prox imagem pode ser de A para B quando de B para A
+	def __setProxImageMob(self):
+		#Caso for true muda para a proxima imagem, caso contrário vai para a imagem anterior
+		#Criar movimento para direita e esquerda
+		if self.mobVelocity > 0:
+			if self.numCurrentImageMob == self.qntImageMob-1:
+				self.__setImageMob(0)
+			else:
+				self.__setImageMob(self.numCurrentImageMob+1)
+		else:
+			if self.numCurrentImageMob == 0:
+				self.__setImageMob(self.qntImageMob-1)
+			else:
+				self.__setImageMob(self.numCurrentImageMob-1)
 
 	def resetVariables(self):
 		self.__loadVariables()
 
 	def draw(self, background):
-		background.blit(self.image, (self.rect.x, self.rect.y), (self.__vectorPosX[self.currentImage],self.__vectorPosY[self.currentImage],96,96))
-
-	def __setImagensPositions(self):
-		self.__vectorPosX[0] = 0
-		self.__vectorPosX[1] = 96
-		self.__vectorPosX[2] = 192
-		self.__vectorPosX[3] = 0
-		self.__vectorPosX[4] = 96
-		self.__vectorPosX[5] = 192
-
-		self.__vectorPosY[0] = 96
-		self.__vectorPosY[1] = 96
-		self.__vectorPosY[2] = 96
-		self.__vectorPosY[3] = 192
-		self.__vectorPosY[4] = 192
-		self.__vectorPosY[5] = 192
+		background.blit(self.__currentImageMob, (self.currentMobPosX, self.settings.valuePosY-self.__rectMob.h))
 
 	def __step(self):
 		if self.inMoving:
-			self.rect.x += self.velocidadeMob     #Move o Mob
+			self.currentMobPosX += self.mobVelocity     #Move o Mob
 			#Verifica se o player está se movendo na mesma do mob ou na direção oposta
 			#Se estiver se movendo na mesma direção afasta o mob, caso contrario aproxima
 			if self.player.inMoving:
 				if self.player.colisionRight and self.player.velocidadeJogador > 0 or self.player.colisionLeft and self.player.velocidadeJogador < 0:
 					pass
 				else:
-					if not self.player.velocidadeJogador > 0 and self.velocidadeMob > 0:
-						self.rect.x -= self.player.velocidadeJogador         #Afasta o mob do jogador
-					elif self.player.velocidadeJogador < 0 and self.velocidadeMob < 0:
-						self.rect.x -= self.player.velocidadeJogador         #Afasta o mob do jogador
+					if not self.player.velocidadeJogador > 0 and self.mobVelocity > 0:
+						self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
+					elif self.player.velocidadeJogador < 0 and self.mobVelocity < 0:
+						self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
 					else:
-						self.rect.x += self.player.velocidadeJogador*-1      #Aproxima os dois
+						self.currentMobPosX += self.player.velocidadeJogador*-1      #Aproxima os dois
 
 		else:  #Se o mob não está se movendo
 			#Afasta o mob caso o player se mova para o lado oposto
 			#Perceba que o mob voltara a andar pois ao mudar o rect, ao passar pela função de colisão os dois não estarão mais em contato e o mob voltará a se mover
 			if self.player.inMoving:
-				if self.velocidadeMob > 0 and self.player.velocidadeJogador > 0:
-					self.rect.x -= self.player.velocidadeJogador
-				elif self.velocidadeMob < 0 and self.player.velocidadeJogador < 0:
-					self.rect.x -= self.player.velocidadeJogador
+				if self.mobVelocity > 0 and self.player.velocidadeJogador > 0:
+					self.currentMobPosX -= self.player.velocidadeJogador
+				elif self.mobVelocity < 0 and self.player.velocidadeJogador < 0:
+					self.currentMobPosX -= self.player.velocidadeJogador
 
 	def update(self):
+		#Mob sempre muda a imagem de se movendo, mesmo quando esta atacando
+		self.__updateMobImage()
 		self.__step()
+		#self.currentMobPosX += self.mobVelocity
+		#self.__updateVelocity()
+		#self.__step()
 		if self.inMoving:     #Se estiver se movendo
 			self.__updateVelocity()
-			self.__updateCurrentImage()
 
-	def __updateCurrentImage(self):
-		if self.velocidadeMob < 0:
-			if self.currentImage == 6:
-				self.currentImage = 0
-				return
-			if self.currentImage < 3:
-				if self.contadorImage == self.velocidadeImage:
-					self.currentImage = (self.currentImage+1) % 3
-					self.contadorImage = 0
-				self.contadorImage +=1
-			else:
-				self.currentImage = 0
-				self.contadorImage = 0
-		else:
-			if self.currentImage == 6:
-				self.currentImage = 3
-				return
-			if self.currentImage > 2:
-				if self.contadorImage == self.velocidadeImage:
-					self.currentImage = ((self.currentImage+1) % 3) + 3
-					self.contadorImage = 0
-				self.contadorImage+=1
-			else:
-				self.currentImage = 3
-				self.contadorImage = 0
+	def __updateMobImage(self):
+		self.countImageMob += 1
+		if self.countImageMob == self.velocityImageMob:
+			self.__setProxImageMob()
+			self.countImageMob = 0
 
 	def __updateVelocity(self):
 		#Altera a velocidade para seguir o player
-		if self.player.rect.x < self.rect.x and self.velocidadeMob > 0:
-			self.velocidadeMob *= -1
-		elif self.player.rect.x > self.rect.x and self.velocidadeMob < 0:
-			self.velocidadeMob *= -1
+		if self.player.rect.x < self.currentMobPosX and self.mobVelocity > 0:
+			self.mobVelocity *= -1
+		elif self.player.rect.x > self.currentMobPosX and self.mobVelocity < 0:
+			self.mobVelocity *= -1

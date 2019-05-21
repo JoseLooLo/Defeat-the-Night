@@ -27,12 +27,12 @@ class Player(pygame.sprite.Sprite):
 		self.__currentImage = 0                      #Imagem Inicial
 		self.__duracaoAirJump = 5                    #Tempo que o jogador irá permanecer no ar encostado no topo do jump
 		self.__duracaoJump = 20
-		self.__imunityTime = self.settings.imunityTime    #Tempo de imunidado após levar dano
+		self.__imunityTime = self.settings.imunityTimePlayer    #Tempo de imunidado após levar dano
 
 		#Status
-		self.__velocidadeJogador = self.settings.velocidadeJogador   #velocidade inicial do jogador
-		self.__damageJogador = self.settings.damageJogador
-		self.__vidaJogador = self.settings.vidaJogador
+		self.__velocidadeJogador = self.settings.velocityPlayer   #velocidade inicial do jogador
+		self.__damageJogador = self.settings.damagePlayer
+		self.__vidaJogador = self.settings.lifePlayer
 
 		#Contadores
 		self.__VelocidadeImage = 6                     #Velocidade da troca de imagem do jogador
@@ -179,10 +179,9 @@ class Player(pygame.sprite.Sprite):
 		self.colisionRight = False
 
 	def __checkColisionAtack(self, mob):
-		self.tempMobRect = mob.rect.copy()
+		self.tempMobRect = mob.getRectMob().copy()
 		self.tempWeaponRect = self.weapon.rect.copy()
 		if not self.posMouseRight:
-			self.tempMobRect.x -= self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
 			self.tempMobRect.x += self.weapon.rect.w
 			self.tempWeaponRect.x = self.rect.x+30
 			self.tempWeaponRect.y = self.rect.y+25
@@ -191,10 +190,9 @@ class Player(pygame.sprite.Sprite):
 				print (self.tempWeaponRect)
 				print (self.tempMobRect)
 				self.ifHit = True
-				mob.rect.x -= self.weapon.weaponKnockBack
-				mob.vidaMob -= (self.damageJogador + self.weapon.weaponDamage)
+				mob.currentMobPosX.x -= self.weapon.weaponKnockBack
+				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
 		else:
-			self.tempMobRect.x += self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
 			self.tempMobRect.x -= self.weapon.rect.w+30
 			self.tempWeaponRect.x = self.rect.x+self.rect.w/2-50
 			self.tempWeaponRect.y = self.rect.y+25
@@ -203,13 +201,12 @@ class Player(pygame.sprite.Sprite):
 				print (self.tempWeaponRect)
 				print (self.tempMobRect)
 				self.ifHit = True
-				mob.rect.x += self.weapon.weaponKnockBack
-				mob.vidaMob -= (self.damageJogador + self.weapon.weaponDamage)
+				mob.currentMobPosX.x += self.weapon.weaponKnockBack
+				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
 
 	def __checkColision(self, mob):
-		self.tempMobRect = mob.rect.copy()
-		if mob.velocidadeMob > 0:
-			self.tempMobRect.x -= self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
+		self.tempMobRect = mob.getRectMob().copy()
+		if mob.mobVelocity > 0:
 			if self.rect.colliderect(self.tempMobRect):                #Verifica a colisão entre o player e o rect
 				self.__setDamage(mob.damageMob)
 				mob.inMoving = False
@@ -217,8 +214,7 @@ class Player(pygame.sprite.Sprite):
 			elif not mob.inMoving:
 				self.colisionLeft = False
 				mob.inMoving = True
-		elif mob.velocidadeMob < 0:
-			self.tempMobRect.x += self.settings.colisionDiferenceMob1  #Diminui a distancia entre o mob e o player para conseguir verificar a colisão
+		elif mob.mobVelocity < 0:
 			if self.tempMobRect.colliderect(self.rect):                #Verifica a colisão entre o mod e o player
 				self.__setDamage(mob.damageMob)
 				mob.inMoving = False
@@ -314,10 +310,10 @@ class Player(pygame.sprite.Sprite):
 			return
 		
 		if self.inInverseJump:                            #Verifica se está caindo (Pulou, chegou no topo e está caindo)
-			self.rect.y += self.settings.velocidadeJump
+			self.rect.y += self.settings.velocityJump
 			self.contadorJump -= 1
 		else:
-			self.rect.y -= self.settings.velocidadeJump
+			self.rect.y -= self.settings.velocityJump
 			self.contadorJump += 1
 
 		if self.contadorJump == self.__duracaoJump:  #Verifica se pulou até chegar no topo
