@@ -11,8 +11,9 @@ def __init():
 	screen.loadBackground() foi inicializada aqui pois o background não pode ser iniciado
 	na __init__ da classe settings pois a screen ainda não havia sido criada
 	É um método muito importante para criar variaveis utilizadas durante o jogo inteiro
-	NÃO ALTERAR A POSIÇÃO DELA
 	"""
+	a = pygame.image.load("icon.png")
+	pygame.display.set_icon(a)
 	settings.loadBackground()
 	pygame.display.set_caption(settings.game_title)
 	game = Game(settings, screen)

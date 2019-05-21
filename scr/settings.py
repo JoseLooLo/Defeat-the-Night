@@ -2,6 +2,9 @@ import os, sys
 import pygame
 from scr.font import Font
 
+#As variaveis nessa classe deveriam em teoria serem imutáveis, são configurações que alteram todo o jogo
+#Se for necessário alterar, mude apenas nessa classe! Não chame um método externo para alterar
+
 class Settings:
 
 	#Inicializa constantes utilizadas no jogo
@@ -9,7 +12,7 @@ class Settings:
 		#Configurações gerais
 		self.screen_width = 800
 		self.screen_height = 600
-		self.game_title = "Defend the Night"
+		self.game_title = "Defeat the Night"
 		self.gameOver = 0
 
 		""" Fontes disponíveis
@@ -19,17 +22,7 @@ class Settings:
 		CHARRED ZARD.ttf
 		"""
 
-		#Fonte geral
-		self.font = Font()
-		self.fontName = "lunchds.ttf"
-		self.fontSize = 25
-		self.fromSystem = False
-
-		#Fonte relógio
-		self.fontTime = Font()
-		self.fontNameTime = "CHARRED ZARD.ttf"
-		self.fontSizeTime = 60
-		self.fromSystemTime = False
+		
 
 		#Background
 		self.__backgroundImageName = "background.png"  #Nome da imagem do background
@@ -47,9 +40,21 @@ class Settings:
 		#Função que inicializa a classe
 		self.__loadClass()
 		self.__loadVariables()
-		self.__loadFont()
+		self.__createFont()              #Cria as fontes
 
-	def __loadFont(self):
+	def __createFont(self):
+		#Fonte geral
+		self.font = Font()
+		self.fontName = "lunchds.ttf"
+		self.fontSize = 25
+		self.fromSystem = False
+
+		#Fonte relógio
+		self.fontTime = Font()
+		self.fontNameTime = "CHARRED ZARD.ttf"
+		self.fontSizeTime = 60
+		self.fromSystemTime = False
+
 		self.font.changeFont(self.fontName, self.fontSize, self.fromSystem)
 		self.fontTime.changeFont(self.fontNameTime, self.fontSizeTime, self.fromSystemTime)
 

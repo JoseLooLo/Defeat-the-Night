@@ -3,7 +3,6 @@ import pygame
 
 class Font:
 
-    #fontName = Nome da fonte
     #fromSystem = True se a fonte for do sistema e False caso ela esteja na pasta /data/Fonts
     def __init__(self, fontName = "comicsansms", fromSystem = True, fontSize = 30):
         self.__defaultFontName = "comicsansms"
