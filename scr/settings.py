@@ -14,8 +14,6 @@ class Settings:
 		#Icon
 		self.gameIconName = "icon.png"
 
-		pygame.init()
-		pygame.mixer.init(44100, -16,2,2048)
 		self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
 
 		#Configurações gerais
