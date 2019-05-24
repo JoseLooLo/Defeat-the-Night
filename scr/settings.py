@@ -14,7 +14,7 @@ class Settings:
 		#Icon
 		self.gameIconName = "icon.png"
 
-		self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
+		#self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
 
 		#Configurações gerais
 		self.valuePosY = 354             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
