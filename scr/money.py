@@ -26,7 +26,7 @@ class Money(pygame.sprite.Sprite):
     def __loadImages(self):
         self.__imageMoney = []
         for i in range(self.qntImageMoney):
-            tempImage = self.settings.load_Images(str(i)+".png", "HUD/Money", -1)
+            tempImage = self.settings.load_Images(str(i)+".png", "Icon/Money", -1)
             self.__imageMoney.append(tempImage)
         
         self.__currentImageMoney = self.__imageMoney[0]
@@ -54,21 +54,21 @@ class Money(pygame.sprite.Sprite):
 
     def checkColisionPlayer(self, player):
         tempRect = self.__rectMoney.copy()
-        tempRect.x = self.posXDrop-self.settings.posX
-        tempRect.y = player.rect.y
+        tempRect.x = self.posXDrop
+        tempRect.y = player.getRectPlayer().y
 
-        if tempRect.colliderect(player.rect):
+        if tempRect.colliderect(player.getRectPlayer()):
             return True
-        elif player.rect.colliderect(tempRect):
+        elif player.getRectPlayer().colliderect(tempRect):
             return True
         else:
             return False
 
 
-    def draw(self, background):
+    def draw(self, camera):
         #Ao dar zoom se perde a colorkey
         #Setar a colorkey antes de dar blit
         colorkey = self.__currentImageMoney.get_colorkey()
         tempImage = pygame.transform.rotozoom(self.__currentImageMoney,0,(1/self.zoomMoney))
         tempImage.set_colorkey(colorkey)
-        background.blit(tempImage, (self.posXDrop-self.settings.posX, self.settings.valuePosY-self.__rectMoney.h*(1/self.zoomMoney)))
+        camera.draw(tempImage, (self.posXDrop, self.settings.valuePosY-self.__rectMoney.h*(1/self.zoomMoney)))

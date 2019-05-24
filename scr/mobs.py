@@ -4,10 +4,11 @@ from random import randint
 
 class Mobs(pygame.sprite.Sprite):
 
-	def __init__(self, settings, player, mobID):
+	def __init__(self, settings, player, background, mobID):
 		pygame.sprite.Sprite.__init__(self)
 		self.settings = settings
 		self.player = player
+		self.background = background
 		self.mobID = mobID
 
 		self.__init()
@@ -29,14 +30,10 @@ class Mobs(pygame.sprite.Sprite):
 		self.mobLife = self.settings.getMobStatusLife(self.mobID) + randint(0, self.settings.getMobStatusLifeLimit(self.mobID))
 
 		#Variaveis de controle
-		self.inMoving = True
-		self.currentMobPosX = -100
+		self.currentMobPosX = 4500
 
 		if self.settings.generalInfo:
-			print ("Mob ID = "+str(self.mobID))
-			print ("Velocidade MOB = "+str(self.mobVelocity))
-			print ("Dano MOB = "+str(self.mobDamage))
-			print ("Vida MOB = "+str(self.mobLife))
+			print ("New Mob ID = %d | posX %d | Dmg %d | Vel %d | HP %d " % (self.mobID, self.currentMobPosX, self.mobDamage, self.mobVelocity, self.mobLife))
 
 	def __loadImages(self):
 		self.__imageMob = []
@@ -55,7 +52,6 @@ class Mobs(pygame.sprite.Sprite):
 	def getRectMob(self):
 		tempRect = self.__rectMob.copy()
 		tempRect.x = self.currentMobPosX
-		tempRect.y = 380
 		return tempRect
 
 	#Como o mob pode se mover para a direita ou esquerda, segue que a prox imagem pode ser de A para B quando de B para A
@@ -76,8 +72,8 @@ class Mobs(pygame.sprite.Sprite):
 	def resetVariables(self):
 		self.__loadVariables()
 
-	def draw(self, background):
-		background.blit(self.__currentImageMob, (self.currentMobPosX, self.settings.valuePosY-self.__rectMob.h))
+	def draw(self, camera):
+		camera.draw(self.__currentImageMob, (self.currentMobPosX, self.settings.valuePosY-self.__rectMob.h))
 
 	def update(self):
 		#Mob sempre muda a imagem de se movendo, mesmo quando esta atacando
@@ -86,20 +82,18 @@ class Mobs(pygame.sprite.Sprite):
 		self.__updateVelocity()
 
 	def __step(self):
-		"""Aqui tem um bug que o slime fica indo de um lado para o outro se está sobre o player"""
-		if self.inMoving:
-			self.currentMobPosX += self.mobVelocity
-		"""Arrumo depois"""
-		if self.player.inMoving:
-			if self.player.colisionRight and self.player.velocidadeJogador > 0 or self.player.colisionLeft and self.player.velocidadeJogador < 0:
-				pass
-			else:
-				if not self.player.velocidadeJogador > 0 and self.mobVelocity > 0:
-					self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
-				elif self.player.velocidadeJogador < 0 and self.mobVelocity < 0:
-					self.currentMobPosX -= self.player.velocidadeJogador         #Afasta o mob do jogador
-				else:
-					self.currentMobPosX += self.player.velocidadeJogador*-1      #Aproxima os dois
+		if self.__checkColisionPlayer():
+			return
+		self.currentMobPosX += self.mobVelocity
+
+	def __checkColisionPlayer(self):
+		tempMobRect = self.getRectMob().copy()
+		tempMobRect.y = self.player.getRectPlayer().y
+		if self.player.getRectPlayer().colliderect(tempMobRect):
+			return True
+		if tempMobRect.colliderect(self.player.getRectPlayer()):
+			return True
+		return False
 
 	def __updateMobImage(self):
 		self.countImageMob += 1
@@ -109,7 +103,9 @@ class Mobs(pygame.sprite.Sprite):
 
 	def __updateVelocity(self):
 		#Altera a velocidade para seguir o player
-		if self.player.rect.x < self.currentMobPosX and self.mobVelocity > 0:
+		if self.__checkColisionPlayer():
+			return
+		if self.player.getPlayerPosX() - self.player.getRectPlayer().w < self.currentMobPosX and self.mobVelocity > 0:
 			self.mobVelocity *= -1
-		elif self.player.rect.x > self.currentMobPosX and self.mobVelocity < 0:
+		elif self.player.getPlayerPosX() + self.player.getRectPlayer().w > self.currentMobPosX and self.mobVelocity < 0:
 			self.mobVelocity *= -1

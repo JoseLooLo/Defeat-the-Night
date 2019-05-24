@@ -4,24 +4,19 @@ from scr.settings import Settings
 from scr.game import Game
 
 def __init():
-	pygame.init()
-	settings = Settings()
-	screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))
-	""" >>>>> NÃO ALTERE ESSA LINHA <<<<<<<
-	screen.loadBackground() foi inicializada aqui pois o background não pode ser iniciado
-	na __init__ da classe settings pois a screen ainda não havia sido criada
-	É um método muito importante para criar variaveis utilizadas durante o jogo inteiro
-	"""
-	a = pygame.image.load("icon.png")
-	pygame.display.set_icon(a)
-	settings.loadBackground()
-	pygame.display.set_caption(settings.game_title)
-	game = Game(settings, screen)
+	pygame.init()            #Inicia o pygame
+	settings = Settings()    #Cria um objeto Setting
+	#screen = pygame.display.set_mode((0,0), pygame.RESIZABLE)  #Cria a tela
+	screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))  #Cria a tela
+	gameIcon = pygame.image.load(settings.gameIconName)  #Cria o Icone do jogo
+	pygame.display.set_icon(gameIcon)                    #Adiciona o Icone do jogo na screen
+	pygame.display.set_caption(settings.gameName)   #Adiciona o Nome do jogo na screen
+
+	game = Game(settings, screen)   #Inicia o jogo
 
 __init()
 
-"""Todas as classes além da main possuirão um método __loadClass()
-	que irá inicializar algumas variaveis importantes"""
-"""__loadClass() possui constantes que não podem ser alteradas"""
-"""loadVariables() é uma quase cópia da loadclass para poder modificar as variaveis sem alterar a loadClass()"""
-"""resetVariables() fará a loadVariables ter os mesmos valores de __loadClass()"""
+"""
+Todas as classes do jogo em geral possuem como argumento de criação a classe Settings
+As classes ao serem criadas chamam __init() para fazer as configurações iniciais
+"""

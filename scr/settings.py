@@ -2,31 +2,23 @@ import os, sys
 import pygame
 from scr.font import Font
 
-#As variaveis nessa classe deveriam em teoria serem imutáveis, são configurações que alteram todo o jogo
-#Se for necessário alterar, mude apenas nessa classe! Não chame um método externo para alterar
-
 class Settings:
 
 	#Inicializa constantes utilizadas no jogo
 	def __init__(self):
 		#Configurações gerais
 		self.screen_width = 900
-		self.screen_height = 500
-		self.game_title = "Defeat the Night"
+		self.screen_height = 650
+		self.gameName = "Defeat the Night"
 
-		#Background
-		self.__backgroundImageName = "background.png"  #Nome da imagem do background
-		self.__backgroundPathName = "background"       #Nome da pasta que está a imagem background
+		#Icon
+		self.gameIconName = "icon.png"
 
-		#Tabela de cores utilizadas e/ou uteis
-		self.color_black = (0,0,0)
-		self.color_white = (255,255,255)
-		self.color_red = (255,0,0)
-		self.color_yellow = (238,255,8)
-		self.color_green = (2,164,0)
+		pygame.mixer.init()
+		self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
 
-		self.generalInfo = True
-		self.valuePosY = 470             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
+		#Configurações gerais
+		self.valuePosY = 354             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
 
 		self.__init()
 
@@ -48,23 +40,114 @@ class Settings:
 		self.fontTime = Font("CHARRED ZARD.ttf", False, 60)
 
 	def __loadVariables(self):
+		self.__loadColorVariables()
+		self.__loadInfoVaribles()
 		self.__loadPlayerVariables()
 		self.__loadMobVariables()
 		self.__loadTimeVariables()
 		self.__loadNPCVariables()
 		self.__loadMoneyVariables()
+		self.__loadBackgroundVariables()
+		self.__loadSoundVariables()
+
+	def __loadColorVariables(self):
+		#Tabela de cores utilizadas e/ou uteis
+		self.color_black = (0,0,0)
+		self.color_white = (255,255,255)
+		self.color_red = (255,0,0)
+		self.color_yellow = (238,255,8)
+		self.color_green = (2,164,0)
+
+	def __loadInfoVaribles(self):
+		self.generalInfo = True        #Print de informações úteis para debug
+		self.showPosInHUD = True
+		self.showHUDPlayer = True
+
+		self.HUDPosXColor = self.color_black
+		self.HUDPosYColor = self.color_black
+		self.HUDHeartColor = self.color_red
+		self.HUDDamageColor = self.color_black
+		self.HUDSpeedColor = self.color_black
+		self.HUDCoinColor = self.color_green
+
+	def __loadBackgroundVariables(self):
+		#A ordem de incersão é importante
+		self.backgroundQntImages = []
+		self.backgroundFillColor = self.color_white
+
+		#Quantidade de imagens possui o background
+		self.backgroundQntImages.append(1)
+
+	def getBackgroundQntImages(self, backgroundID):
+		return self.backgroundQntImages[backgroundID]
 
 	def __loadPlayerVariables(self):
-		#Status padrão Jogador
-		self.velocityPlayer = 5          #Velocidade de movimento inicial do player
-		self.damagePlayer = 5            #Dano inicial do player
-		self.lifePlayer = 80			 #Vida inicial do player
-		self.imunityTimePlayer = 20      #Tempo de imunidade ao levar dano
-		self.velocityJump = 10           #Velocidade do pulo
+		#A ordem de incersão é importante
+		self.playerName = []
+		self.playerQntImagesWalk = []
+		self.playerQntImagesStop = []
+		self.playerVelocityImages = []
+		self.playerStatusDamage = []
+		self.playerStatusVelocity = []
+		self.playerStatusLife = []
+		self.playerStatusMoney = []
+		self.playerStatusImunityTime = []
+		self.playerStatusVelocityJump = []
+		self.playerStatusHeightJump = []
 
-		"""Variaveis para alterar"""
-		self.imageJogadorW = 96
-		self.imageJogadorH = 96
+		#Nome de cada personagem  << Feito para conseguir adicionar novas skins ou novos personagens no jogo
+		self.playerName.append("Default")
+
+		#Qnt de imagens da skin
+		self.playerQntImagesWalk.append(6)
+
+		#Qnt de imagens da skin parado
+		self.playerQntImagesStop.append(4)
+
+		#Velocidade de troca de imagens do movimento do player
+		self.playerVelocityImages.append(4)
+
+		#Status do player
+		self.playerStatusDamage.append(5)
+		self.playerStatusVelocity.append(15)
+		self.playerStatusLife.append(80)
+		self.playerStatusMoney.append(0)
+		self.playerStatusImunityTime.append(20)
+
+		#Jump
+		self.playerStatusVelocityJump.append(1)
+		self.playerStatusHeightJump.append(200)
+		self.playerStatusDefaultJumpTime = 7
+
+	def getPlayerQntImagesWalk(self, playerID):
+		return self.playerQntImagesWalk[playerID]
+
+	def getPlayerQntImagesStop(self, playerID):
+		return self.playerQntImagesStop[playerID]
+	
+	def getPlayerVelocityImages(self, playerID):
+		return self.playerVelocityImages[playerID]
+	
+	def getPlayerStatusDamage(self, playerID):
+		return self.playerStatusDamage[playerID]
+
+	def getPlayerStatusVelocity(self, playerID):
+		return self.playerStatusVelocity[playerID]
+
+	def getPlayerStatusLife(self, playerID):
+		return self.playerStatusLife[playerID]
+
+	def getPlayerStatusMoney(self, playerID):
+		return self.playerStatusMoney[playerID]
+
+	def getPlayerStatusImunityTime(self, playerID):
+		return self.playerStatusImunityTime[playerID]
+
+	def getPlayerStatusVelocityJump(self, playerID):
+		return self.playerStatusVelocityJump[playerID]
+
+	def getPlayerStatusHeightJump(self, playerID):
+		return self.playerStatusHeightJump[playerID]
 
 	def __loadMobVariables(self):
 		#A ordem de incersão é importante
@@ -141,25 +224,23 @@ class Settings:
 	def __loadTimeVariables(self):
 		#Time
 		#Define qual hora irá iniciar o dia e a noite
-		self.timeInitDay = 7
-		self.timeInitNight = 16
+		self.hrInitDay = 7
+		self.hrInitNight = 16
 
 		#Define o horario inicial do jogo
-		self.timeHr = 15
-		self.timeMin = 59
-		self.timeDays = 1
+		self.timeHr = 6
+		self.timeMin = 0
+		self.Day = 1
 
 		#Define a velocidade que o dia e a noite irá passar
 		#Quanto maior o valor, mais lento o relogio irá passar
 		#self.timeMinVelocity é a velocidade atual do tempo.
-		self.timeMinVelocityNight = 10
-		self.timeMinVelocityDay = 2
-		#Inicia com velocidade do tempo noturno, porém verifica se está de dia e altera o valor
-		self.timeMinVelocity = self.timeMinVelocityNight
-		if self.timeHr >= self.timeInitDay and self.timeHr < self.timeInitNight:
-			self.timeMinVelocity = self.timeMinVelocityDay
+		self.velocityTimeNight = 10
+		self.velocityTimeDay = 10
 
-		self.timeCounter = 0
+		#Cor do relogio
+		self.textClockTimeColor = self.color_yellow
+		self.textClockDayColor = self.color_red
 
 	def __loadNPCVariables(self):
 		#A ordem de incersão é importante
@@ -167,6 +248,7 @@ class Settings:
 		self.npcQntImages = []
 		self.npcVelocityImages = []
 		self.npcPosX = []
+		self.npcHaveClosed = []
 
 		#Nome dos NPCS
 		self.npcName.append("Rodolfo")
@@ -184,9 +266,17 @@ class Settings:
 		self.npcVelocityImages.append(30)
 
 		#PosX dos NPC's
-		self.npcPosX.append(2100)
-		self.npcPosX.append(2500)
-		self.npcPosX.append(2900)
+		self.npcPosX.append(3600)
+		self.npcPosX.append(4700)
+		self.npcPosX.append(5300)
+
+		#Verifica se o NPC possui imagem de Loja fechada
+		self.npcHaveClosed.append(True)
+		self.npcHaveClosed.append(True)
+		self.npcHaveClosed.append(False)
+
+	def getNPCHaveClosed(self, npcID):
+		return self.npcHaveClosed[npcID]
 
 	def getNPCPosX(self, npcID):
 		return self.npcPosX[npcID]
@@ -220,28 +310,20 @@ class Settings:
 
 	def getMoneyZoom(self, moneyID):
 		return self.moneyZoom[moneyID]
+	
+	def __loadSoundVariables(self):
+		self.soundNPCNoMoneyName = []
+		
+		#Nome do som do NPC quando vc está sem dinheiro
+		self.soundNPCNoMoneyName.append("NoMoney.ogg")
 
-	def loadBackground(self):
-		#Inicialmente o background iria ser iniciado no __init__ pois é algo fixo
-		#Porém não há como inicializar imagens antes de iniciar a screen
-		""">>>>>>>>>>>>>>>> IMPORTANTE <<<<<<<<<<<<<<<<<<<
-		SEMPRE CHAME ESSE MÉTODO DEPOIS DA SCREEN TER SIDO CRIADA
-		"""
-		self.image_background = self.load_Images(self.__backgroundImageName, self.__backgroundPathName)
-		#Variaveis de controle da posição do personagem na tela
-		"""MUITO IMPORTANTE"""
-		self.posX = int((self.image_background.get_size()[0] - self.screen_width)/2)  #PosX da metade do background
-		self.posY = 380                                                               #PosY da divisa do chão
+	def getSoundNPCNoMoney(self, npcID):
+		return self.soundNPCNoMoneyName[npcID]
 
 	def resetVariables(self):
 		self.__loadVariables()
-		self.loadBackground()
 
 	def loadDefaultImages(self):
-		#Imagem do Player
-		self.player = self.load_Images("player.png", None, -1)
-		#Imagem dos Mobs
-		self.mob = self.load_Images("player.png", None, -1)
 		#Imagem das armas
 		self.weapon = self.load_Images("weapon.png",None,-1)
 

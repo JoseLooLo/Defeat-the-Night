@@ -4,6 +4,10 @@ from scr.player import Player
 from scr.mobs import Mobs
 from scr.npc import Npc
 from scr.money import Money
+from scr.time import Time
+from scr.background import Background
+from scr.hud import Hud
+from scr.camera import Camera
 from random import randint
 
 class Game:
@@ -11,80 +15,60 @@ class Game:
 	def __init__(self, settings, screen):
 		self.settings = settings
 		self.screen = screen
+
+		self.__init()
+
+	def __init(self):
+		self.__temp()
+		self.__loadVariables()
+		self.__createLists()
+		self.__createCamera()
+		self.__createObjects()
+		self.__gameLoop()
+
+	def __temp(self):
 		#Carrega as imagens utilizadas no jogo
 		self.settings.loadDefaultImages()
 
-		#Inicia variaveis de controle // Pode ser alterado durante o programa
-		self.__loadGameVariables()
+	def __loadVariables(self):
+		self.showInformationsPlayer = True    #HUD Player
+		self.showInformationsGame = True      #HUD Game
+		self.gameOver = False                 #GameOver?
 
-		#Cria o Surface backGround e adicinar a imagem de background
-		self.background = pygame.Surface((self.settings.screen_width, self.settings.screen_height))
-		self.background = self.background.convert()
-		self.background.fill(self.settings.color_white)
-		self.background.blit(self.settings.image_background, (0,0), (self.settings.posX, 0, self.settings.screen_width, self.settings.screen_height))
-
+	def __createLists(self):
 		#Cria os grupos de sprites
 		self.listMobs = pygame.sprite.Group()
 		self.listNPC = pygame.sprite.Group()
 		self.listMoney = pygame.sprite.Group()
-
-		#Inicializa objetos e textos
+	
+	def __createObjects(self):
+		#Inicializa objetos
 		self.__createSprites()              #Cria os objetos de personagem e mobs
-		self.__createText()                 #Cria os textos que irão aparecer na tela
 
-		self.clock = pygame.time.Clock()
+	def __createCamera(self):
+		self.__camera = Camera(self.settings, self.screen)
+	
+	def __gameLoop(self):
+		self.clockFPS = pygame.time.Clock()
+		self.__spawnMobs()
 		#Loop do jogo
 		while 1:
 			self.__draw()                    #Desenha os objetos na tela
 			self.__checkEvents()             #Verifica se houve algum evento
 			self.__update()                  #Atualiza os objetos na tela
 			self.__checkColision()           #Verifica se houve colisão entre Mob e Player
-			self.clock.tick(60)              #FPS counter
-			self.__gameover()
+			self.clockFPS.tick(60)           #FPS counter
 		pygame.display.flip()
 
-	
-	def __gameover(self):
-		
-		if self.gameOver == 1:
-			self.textGO1 = self.settings.fontGeneral.font.render("E morreu.",1,self.settings.color_red)
-			self.textGO2 = self.settings.fontGeneral.font.render("Clique ENTER para continuar",1,self.settings.color_red)
-			self.textGO3 = self.settings.fontGeneral.font.render("Ou 's' para SAIR",1,self.settings.color_red)
-			
-			while self.gameOver == 1:
-				self.__checkEventGameOver()
-				self.screen.blit(self.background, (0,0))
-				self.background.blit(self.settings.image_background, (0,0), (self.settings.posX,0,self.settings.screen_width,self.settings.screen_height))
-				self.background.blit(self.textGO1, (50,200))
-				self.background.blit(self.textGO2, (50,250))
-				self.background.blit(self.textGO3, (50,300))
-				pygame.display.update()
-			pygame.display.flip()
-
-	def __checkEventGameOver(self):
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT: sys.exit()
-			if event.type == pygame.KEYUP:
-				if event.key == pygame.K_RETURN:
-					self.__resetGame()
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_s:
-					sys.exit()
-
-	def __resetGame(self):
-		self.__destroyMobs()
-		self.player.resetVariables()
-		self.settings.resetVariables()
-		self.gameOver = 0
-
-	def __createMobs(self):
+	def __spawnMobs(self):
 		for _ in range(0,1):
-			mobs = Mobs(self.settings, self.player, 0)
+			mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),0)
 			self.listMobs.add(mobs)
 
 	def __destroyMobs(self):
 		for mob in self.listMobs.sprites():
 			self.listMobs.remove(mob)
+			self.__createMoney(0,mob.getRectMob().x+mob.getRectMob().w/2,1)
 			del mob
 
 	def __checkColision(self):
@@ -96,7 +80,9 @@ class Game:
 	def __checkColisionPlayerMoney(self):
 		for money in self.listMoney.sprites():
 			if money.checkColisionPlayer(self.player):
-				self.player.money += money.value
+				self.player.playerMoney += money.value
+				if self.settings.generalInfo:
+					print ("Get money %d" % (money.value))
 				self.listMoney.remove(money)
 				del money
 
@@ -105,66 +91,43 @@ class Game:
 			npc.checkColisionPlayer(self.player)
 
 	def __checkColisionWeaponMob(self):
-		if not self.player.ifHit:
-			for mob in self.listMobs.sprites():
-				self.player.colisionWeapon(mob)
-				if mob.mobLife <= 0:
-					self.__createMoney(0,self.settings.posX+mob.getRectMob().x+mob.getRectMob().w/2,1)
-					self.listMobs.remove(mob) 
-					self.player.removeColision()
-					del mob
+		return
+		# if not self.player.ifHit:
+		# 	for mob in self.listMobs.sprites():
+		# 		self.player.colisionWeapon(mob)
+		# 		if mob.mobLife <= 0:
+		# 			self.__createMoney(0,self.settings.posX+mob.getRectMob().x+mob.getRectMob().w/2,1)
+		# 			self.listMobs.remove(mob) 
+		# 			self.player.removeColision()
+		# 			del mob
 	
 	def __checkColisionPlayerMob(self):
 		for mob in self.listMobs.sprites():
 			self.player.colisionMob(mob)
 			
-	def __updateTime(self):
-		if self.settings.timeCounter == self.settings.timeMinVelocity:   #Passou 1 min
-			self.settings.timeCounter = 0
-			if self.settings.timeMin == 59:
-				self.settings.timeMin = 0
-				if self.settings.timeHr == 23:
-					self.settings.timeHr = 0
-					self.settings.timeDays += 1
-				else:
-					self.settings.timeHr += 1
-					if self.settings.timeHr == 16:
-						self.__createMobs()
-					elif self.settings.timeHr == 8:
-						self.__destroyMobs()
-				#Altera a velocidade do dia ou da noite
-				if self.settings.timeHr > 7 and self.settings.timeHr < 16:
-					self.settings.timeMinVelocity = self.settings.timeMinVelocityDay
-				else:
-					self.settings.timeMinVelocity = self.settings.timeMinVelocityNight
-			else:
-				self.settings.timeMin += 1
-		else:
-			self.settings.timeCounter += 1
-
 	def __checkEvents(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT: sys.exit()
-			if event.type == pygame.MOUSEBUTTONUP:
-				self.player.atack()
+			# if event.type == pygame.MOUSEBUTTONUP:
+			# 	self.player.atack()
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_d:
-					self.player.inMoving = False
+					self.player.setInMoving(False)
 				elif event.key == pygame.K_a:
-					self.player.inMoving = False
+					self.player.setInMoving(False)
 				if event.key == pygame.K_F3:
 					self.showInformationsPlayer = not self.showInformationsPlayer
 				if event.key == pygame.K_F4:
 					self.showInformationsGame = not self.showInformationsGame
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_d:
-					if self.player.velocidadeJogador < 0:
-						self.player.velocidadeJogador *= -1
-					self.player.inMoving = True
+					if self.player.playerVelocity < 0:
+						self.player.playerVelocity *= -1
+					self.player.setInMoving(True)
 				elif event.key == pygame.K_a:
-					if self.player.velocidadeJogador > 0:
-						self.player.velocidadeJogador *= -1
-					self.player.inMoving = True
+					if self.player.playerVelocity > 0:
+						self.player.playerVelocity *= -1
+					self.player.setInMoving(True)
 				if event.key == pygame.K_SPACE:
 					self.player.inJump = True
 				if event.key == pygame.K_w:
@@ -172,88 +135,85 @@ class Game:
 						if npc.colisionPlayer:
 							npc.sell(self.player)
 
-	def __updateText(self):
-		#Update Time
-		Hr = str(self.settings.timeHr)
-		if self.settings.timeHr < 10:
-			Hr = "0"+Hr
-		Min = str(self.settings.timeMin)
-		if self.settings.timeMin < 10:
-			Min = "0"+Min
-		self.textTime = self.settings.fontTime.font.render(Hr+":"+Min,1,self.settings.color_yellow)
-		self.textDay = self.settings.fontTime.font.render("DAY "+str(self.settings.timeDays),1,self.settings.color_red)
-		self.textPosX = self.settings.fontGeneral.font.render(str(self.settings.posX),1,(10,10,10))
-		self.textPosY = self.settings.fontGeneral.font.render(str(self.player.rect.y),1,(10,10,10))
-		self.textVelocidadeJogador = self.settings.fontGeneral.font.render(str(abs(self.player.velocidadeJogador)),1,(10,10,10))
-		self.textDamageJogador = self.settings.fontGeneral.font.render    (str(self.player.damageJogador),1,(10,10,10))
-		self.textVidaJogador = self.settings.fontGeneral.font.render      (str(self.player.vidaJogador),1,self.settings.color_red)
-		self.textMoneyJogador = self.settings.fontGeneral.font.render      (str(self.player.money),1,self.settings.color_green)
 
 	def __updateObject(self):
 		self.player.update()    #Faz update no player
+		self.clock.update()     #Faz update no relogio
 		self.listNPC.update()   #Faz update em todos os NPCS existentes
 		self.listMobs.update()  #Faz update em todos os mobs existentes
 		self.listMoney.update() #Faz update em todos os dinheiros dropados
+		self.hud.update()       #Faz update no HUD
 
 	def __update(self):
 		self.__updateObject()
-		self.__updateText()
-		self.__updateTime()
 		pygame.display.update()
 
 	def __draw(self):
-		self.screen.blit(self.background, (0,0))
-		#Reseta o background
-		self.background.blit(self.settings.image_background, (0,0), (self.settings.posX,0,self.settings.screen_width,self.settings.screen_height))
+		self.__blitAndResetScreen()
 		self.__drawObject()
 		self.__drawText()
+
+	def __blitAndResetScreen(self):
+		self.__camera.drawScreen()
+		
+		#self.__camera.drawBackgroundImage()
+		# self.screen.blit(self.background.getBackgroundSurface(), (0,0),(0, 0, self.settings.screen_width, self.settings.screen_height))  #Blit Screen
+		# pygame.display.flip()
+		# self.background.draw()  #Reset Background
 
 	def __drawObject(self):
 		#A ordem que é chamado método DRAW define qual objeto tem prioridade sobre outro na tela
 		#NPC fica no fundo do background
+		
 		for npc in self.listNPC.sprites():
-			npc.draw(self.background)
+			npc.draw(self.__camera)
 		#Em seguida do money
 		for money in self.listMoney.sprites():
-			money.draw(self.background)
+			money.draw(self.__camera)
 		#Em seguida dos mobs
 		for mob in self.listMobs.sprites():
-			mob.draw(self.background)
+			mob.draw(self.__camera)
 		#Player sempre aparece sobre todos os outros objetos
-		self.player.draw(self.background)
+		self.player.draw(self.__camera)
 
 	def __drawText(self):
-		self.background.blit(self.textDay, (self.settings.screen_width/2 -self.player.rect.w/2,30))
-		self.background.blit(self.textTime,(self.settings.screen_width/2 -self.player.rect.w/2,75))
-		if self.showInformationsGame:
-			self.background.blit(self.textPosX,(0,0))
-			self.background.blit(self.textPosY,(0,25))
-		if self.showInformationsPlayer:
-			self.background.blit(self.__iconHP,(1,50))
-			self.background.blit(self.textVidaJogador, (50, 57))
-
-			self.background.blit(self.__iconDamage,(1,self.__iconDamage.get_rect().h +self.__iconHP.get_rect().h+10))
-			self.background.blit(self.textDamageJogador, (50, self.__iconDamage.get_rect().h +self.__iconHP.get_rect().h+17))
-
-			self.background.blit(self.__iconVelocity,(1,self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+20))
-			self.background.blit(self.textVelocidadeJogador, (50, self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+27))
-
-			self.background.blit(self.__iconMoney,(8,self.__iconMoney.get_rect().h+self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+30))
-			self.background.blit(self.textMoneyJogador, (50,self.__iconMoney.get_rect().h+ self.__iconVelocity.get_rect().h+self.__iconDamage.get_rect().h+self.__iconHP.get_rect().h+37))
-			
+		self.clock.draw(self.__camera)
+		self.hud.draw(self.__camera)
 
 	def __createSprites(self):
+		self.__createSpritesClock()
 		self.__createSpritesPlayer()
 		self.__createSpritesNPC()
+		self.__createSpritesHUD()
+
+	def __createSpritesClock(self):
+		self.clock = Time(self.settings, self)
+
+	def newDay(self):
+		#Chamado quando um novo dia inicia
+		if self.settings.generalInfo:
+			print("New day")
+		self.__destroyMobs()
+		for npc in self.listNPC.sprites():
+			npc.resetMarketDay()
+
+	def newNight(self):
+		#Chamado quano uma nova noite começa
+		if self.settings.generalInfo:
+			print("New night")
+		self.__spawnMobs()
+
+	def __createSpritesHUD(self):
+		self.hud = Hud(self.settings, self.player, self.__camera)
 
 	def __createSpritesPlayer(self):
-		self.player = Player(self.settings.player, self.settings)
+		self.player = Player(self.settings, self.__camera, 0)
 
 	def __createSpritesNPC(self):
 		#Cria os NPC
-		self.npcRodolfo = Npc(self.settings, 0)
-		self.npcAdolfinho = Npc(self.settings, 1)
-		self.npcRogerio = Npc(self.settings, 2)
+		self.npcRodolfo = Npc(self.settings, self.clock, self.__camera.getBackground(), 0)
+		self.npcAdolfinho = Npc(self.settings, self.clock, self.__camera.getBackground(), 1)
+		self.npcRogerio = Npc(self.settings, self.clock, self.__camera.getBackground(), 2)
 		#Adiciona na lista de sprites de NPC
 		self.listNPC.add(self.npcRodolfo)
 		self.listNPC.add(self.npcAdolfinho)
@@ -262,29 +222,4 @@ class Game:
 	def __createMoney(self, moneyID, posXDrop, value = 0):
 		money = Money(self.settings, moneyID, posXDrop,value)
 		self.listMoney.add(money)
-
-	def __createText(self):
-		#Time
-		Hr = str(self.settings.timeHr)
-		if self.settings.timeHr < 10:
-			Hr = "0"+Hr
-		Min = str(self.settings.timeMin)
-		if self.settings.timeMin < 10:
-			Min = "0"+Min
-		self.textTime = self.settings.fontTime.font.render(Hr+":"+Min,1,self.settings.color_yellow)
-		self.textDay = self.settings.fontTime.font.render("DAY "+str(self.settings.timeDays),1,self.settings.color_red)
-		self.textPosX = self.settings.fontGeneral.font.render(str(self.settings.posX),1,(10,10,10))
-		self.textPosY = self.settings.fontGeneral.font.render(str(self.player.rect.y),1,(10,10,10))
-		self.textVelocidadeJogador = self.settings.fontGeneral.font.render(str(abs(self.player.velocidadeJogador)),1,(10,10,10))
-		self.textDamageJogador = self.settings.fontGeneral.font.render    (str(self.player.damageJogador),1,(10,10,10))
-		self.textVidaJogador = self.settings.fontGeneral.font.render      (str(self.player.vidaJogador),1,self.settings.color_red)
-		self.textMoneyJogador = self.settings.fontGeneral.font.render      (str(self.player.money),1,self.settings.color_green)
-		self.__iconHP = self.settings.load_Images("Heart.png", "HUD/HUD", -1)
-		self.__iconDamage = self.settings.load_Images("Damage.png", "HUD/HUD", -1)
-		self.__iconVelocity = self.settings.load_Images("Speed.png", "HUD/HUD", -1)
-		self.__iconMoney = self.settings.load_Images("Coin.png", "HUD/HUD", -1)
-
-	def __loadGameVariables(self):
-		self.showInformationsPlayer = True    #HUD Player
-		self.showInformationsGame = True      #HUD Game
-		self.gameOver = False                 #GameOver?
+	

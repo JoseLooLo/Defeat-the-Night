@@ -4,94 +4,167 @@ from scr.weapon import Weapon
 
 class Player(pygame.sprite.Sprite):
 
-	def __init__(self, image, settings):
+	def __init__(self, settings, camera, playerID):
 		pygame.sprite.Sprite.__init__(self)
 		self.settings = settings
-		self.image = image
-		self.rect = image.get_rect()
+		self.playerID = playerID
+		self.camera = camera
 		self.weaponAtual = pygame.sprite.Group()
 
 		self.__init()
 
 	def __init(self):
-		self.__loadClass()
 		self.__loadVariables()
-		self.__setImagensPositions()
+		self.__loadImages()
 		self.__createWeapon()
 
-	def __loadClass(self):
-		#Variaveis importantes
-		self.__qntImages = 7                         #Quantidade de subImagens da imagem do personagem
-		self.__vectorPosX = [0]*self.__qntImages     #Vetor com as posições das subImagens dentro da imagem
-		self.__vectorPosY = [0]*self.__qntImages	 #Não irá ter cópia na loadVariables pois não é preciso resetar
-		self.__currentImage = 0                      #Imagem Inicial
-		self.__duracaoAirJump = 5                    #Tempo que o jogador irá permanecer no ar encostado no topo do jump
-		self.__duracaoJump = 20
-		self.__imunityTime = self.settings.imunityTimePlayer    #Tempo de imunidado após levar dano
-
-		#Status
-		self.__velocidadeJogador = self.settings.velocityPlayer   #velocidade inicial do jogador
-		self.__damageJogador = self.settings.damagePlayer
-		self.__vidaJogador = self.settings.lifePlayer
-
-		#Contadores
-		self.__VelocidadeImage = 6                     #Velocidade da troca de imagem do jogador
-		self.__contadorImage = 0                       #Variavel auxiliar durante a troca de imagem
-		self.__contadorJump = 0                        #Variavel auxiliar durante o jump
-		self.__contadorAirJump = 0                     #Variavel auxiliar durante o Air Jump
-		self.__contadorInDamage = 0                    #Variavel auxiliar durante o tempo que levar dano
-		self.__contadorWeaponDelay = 0                 #Variavel auxiliar para alterar a imagem da arma ao atacar
-		self.__contadorAtackDelay = 0                  #Variavel auxiliar para liberar o atack novamente
-
-		#Rect
-		""">>>>>>>>>>>>>>>>>>>>> ALERTA DE GAMBIARRA DO JOSÉ <<<<<<<<<<<<<<<<<<<"""
-		"""O jogador se manterá FIXO no meio do background. O background que irá se movimentar"""
-		"""Com isso as variaveis rect.x e rect.y do jogador NÃO SE ALTERAM ALÉM DAQUI"""
-		self.rect.x = int(self.settings.screen_width/2)    #X do personagem será no meio da janela
-		self.rect.y = self.settings.posY                   #Y do personagem será na divisão do chão
-		self.rect.w = self.settings.imageJogadorW
-		self.rect.h = self.settings.imageJogadorH
-
-		#Variaveis de controle iniciais
-		self.__inMoving = False           #Verifica se o jogador está se movendo
-		self.__colisionRight = False      #Verifica colisão
-		self.__colisionLeft = False
-		self.__inJump = False             #Verifica se o jogador está pulando
-		self.__inInverseJump = False      #Verifica se o jogador está caindo
-		self.__inAirJump = False          #Verifica se o jogador atigingiu a altura máxima
-		self.__inDamage = False           #Verifica se levou dano
-		self.__inAtack = False            #Verifica se está atacando
-		self.__ifHit = True              #Controla para não atacar diversas vezes seguias
-
-
 	def __loadVariables(self):
-		#Status
-		self.velocidadeJogador = self.__velocidadeJogador
-		self.damageJogador = self.__damageJogador
-		self.vidaJogador = self.__vidaJogador
+		#Variaveis de controle dos Frames
+		self.qntImagePlayerWalk = self.settings.getPlayerQntImagesWalk(self.playerID)
+		self.qntImagePlayerStop = self.settings.getPlayerQntImagesStop(self.playerID)
+		self.numCurrentImagePlayer = 0
+		self.countImagePlayer = 0
+		self.velocityImagePlayer = self.settings.getPlayerVelocityImages(self.playerID)
 
-		self.currentImage = self.__currentImage
-		self.contadorImage = self.__contadorImage
-		self.contadorJump = self.__contadorJump
-		self.contadorAirJump = self.__contadorAirJump
-		self.contadorInDamage = self.__contadorInDamage
-		self.contadorWeaponDelay = self.__contadorWeaponDelay
-		self.contadorAtackDelay = self.__contadorAtackDelay
-		self.money = 0
+		#Variaveis de Status
+		self.playerDamage = self.settings.getPlayerStatusDamage(self.playerID)
+		self.playerVelocity = self.settings.getPlayerStatusVelocity(self.playerID)
+		self.playerLife = self.settings.getPlayerStatusLife(self.playerID)
+		self.playerMoney = self.settings.getPlayerStatusMoney(self.playerID)
+		self.playerImunityTime = self.settings.getPlayerStatusImunityTime(self.playerID)
+		self.countImunityTime = 0
 
-		self.inMoving = self.__inMoving
-		self.colisionRight = self.__colisionRight
-		self.colisionLeft = self.__colisionLeft
-		self.inJump = self.__inJump
-		self.inInverseJump = self.__inInverseJump
-		self.inAirJump = self.__inAirJump
-		self.inDamage = self.__inDamage
-		self.inAtack = self.__inAtack
-		self.ifHit = self.__ifHit
+		#Jump
+		self.playerVelocityJump = self.settings.getPlayerStatusVelocityJump(self.playerID)
+		self.playerHeightJump = self.settings.getPlayerStatusHeightJump(self.playerID)
+		self.playerStatusDefaultJumpTime = self.settings.playerStatusDefaultJumpTime
+		self.countInJumpUp = self.playerHeightJump    #Contador para a subida no pulo
+		self.countInJumpDown = 0                      #Contador para a descida do pulo
+		self.countJumpPlayer = 0
+		self.countAirJumpPlayer = 0
 
-		#Mouse
-		self.posMouseRight = True  #Cursor do mouse está do lado direito da tela | False o mouse está do lado esquerdo
-		
+		#Variaveis de controle
+		self.inMoving = False
+		self.inJump = False
+		self.inAirJump = False
+		self.inDamage = False                  #Verifica se está dentro do tempo de invulnerabilidade 
+		self.colisionRight = False
+		self.colisionLeft = False
+		self.posXMouseInScreenIsRightSide = False
+
+	def __loadImages(self):
+		self.__imagePlayerWalk = []
+		for i in range(self.qntImagePlayerWalk):
+			tempImage = self.settings.load_Images("walking"+str(i)+".png", "Player/ID"+str(self.playerID), -1)
+			self.__imagePlayerWalk.append(tempImage)
+
+		self.__imagePlayerStop = []
+		for i in range(self.qntImagePlayerStop):
+			tempImage = self.settings.load_Images("stopped"+str(i)+".png", "Player/ID"+str(self.playerID), -1)
+			self.__imagePlayerStop.append(tempImage)
+
+		self.__currentImagePlayer = self.__imagePlayerStop[0]
+		self.__rectPlayer = self.__currentImagePlayer.get_rect()
+
+	def __setImagePlayerWalk(self, numImg):
+		self.__currentImagePlayer = self.__imagePlayerWalk[numImg]
+		self.numCurrentImagePlayer = numImg
+		self.__flipImage()
+
+	def __setImagePlayerStop(self, numImg):
+		self.__currentImagePlayer = self.__imagePlayerStop[numImg]
+		self.numCurrentImagePlayer = numImg
+		self.__flipImage()
+
+	def __setProxImagePlayer(self):
+		if self.inMoving:
+			if self.numCurrentImagePlayer == self.qntImagePlayerWalk -1:
+				self.__setImagePlayerWalk(0)
+			else:
+				self.__setImagePlayerWalk(self.numCurrentImagePlayer + 1)
+		else:
+			if self.numCurrentImagePlayer == self.qntImagePlayerStop -1:
+				self.__setImagePlayerStop(0)
+			else:
+				self.__setImagePlayerStop(self.numCurrentImagePlayer + 1)
+
+	def setInMoving(self, inMoving):
+		self.inMoving = inMoving
+		self.numCurrentImagePlayer = 0
+
+	def getPlayerPosX(self):
+		return self.camera.getPosXplayer() + self.settings.screen_width/2
+
+	def update(self):
+		self.__updateMousePosition()
+		self.__updateStep()
+		self.__updateJump()
+		self.__updateCounters()
+
+	def __updateCounters(self):
+		if self.inDamage:
+			self.countImunityTime+=1
+
+	def __updateStep(self):
+		self.countImagePlayer += 1
+		if self.countImagePlayer == self.velocityImagePlayer:
+			self.__setProxImagePlayer()
+			self.__step()
+			self.countImagePlayer = 0
+
+	def __step(self):
+		if not self.__verificaExtremos() and self.inMoving:
+			if self.playerVelocity < 0 and not self.colisionLeft:    #Verifica se o jogador está se movendo para a esquerda e se não está colidindo pela esquerda
+				self.camera.addPlayerPosX(self.playerVelocity)            #Altera a posição do jogador (Na real altera a posição posX que é do background, o personagem é fixo no meio do background)
+			elif self.playerVelocity > 0 and not self.colisionRight:
+				self.camera.addPlayerPosX(self.playerVelocity)
+
+	def __verificaExtremos(self):
+		if self.camera.getBackground().getPosXBackground() + self.playerVelocity < 0:
+			return True
+		if self.camera.getBackground().getPosXBackground() + self.playerVelocity > (self.camera.getBackground().getSizeCurrentImageBackground()[0] - self.settings.screen_width):
+			return True
+		return False
+
+	def __updateJump(self):
+		if self.inJump:
+			self.countJumpPlayer += 1
+			if self.countJumpPlayer == self.playerVelocityJump:
+				self.__jump()
+				self.countJumpPlayer = 0
+	
+	def __jump(self):
+		if self.countInJumpUp - self.playerStatusDefaultJumpTime > 0:
+			self.countInJumpUp -= self.playerStatusDefaultJumpTime
+			self.countInJumpDown += self.playerStatusDefaultJumpTime
+			self.__rectPlayer.y -= self.playerStatusDefaultJumpTime
+		else:
+			if self.countInJumpDown == 0:
+				self.inJump = False
+				self.countInJumpUp = self.playerHeightJump
+				self.countInJumpDown = 0
+			else:
+				self.countInJumpDown -= self.playerStatusDefaultJumpTime
+				self.__rectPlayer.y += self.playerStatusDefaultJumpTime
+
+	def __updateMousePosition(self):
+		#Muda a variavel de controle para verificar a posição do mouse na tela
+		metadeTelaX = int(self.settings.screen_width/2)
+		#pygame.mouse.get_pos()[0] pega a posição X do cursor do mouse atual
+		if pygame.mouse.get_pos()[0] > metadeTelaX:
+			self.posXMouseInScreenIsRightSide = True
+		else:
+			self.posXMouseInScreenIsRightSide = False
+
+	def __flipImage(self):
+		if not self.posXMouseInScreenIsRightSide:
+			tempColorKey = self.__currentImagePlayer.get_colorkey()
+			tempImage = pygame.transform.flip(self.__currentImagePlayer, True, False)
+			tempImage.set_colorkey(tempColorKey)
+			self.__currentImagePlayer = tempImage
+			tempY = self.__rectPlayer.y
+			self.__rectPlayer = self.__currentImagePlayer.get_rect()
+			self.__rectPlayer.y = tempY
 
 	def resetVariables(self):
 		self.__loadVariables()
@@ -100,77 +173,19 @@ class Player(pygame.sprite.Sprite):
 		self.weapon = Weapon(self.settings.weapon, self.settings, self, 1)
 		self.weaponAtual.add(self.weapon)
 
-	def atack(self):
-		if self.inAtack:
-			if self.contadorAtackDelay == self.weapon.weaponDelay:
-				self.inAtack = False
-				self.contadorAtackDelay = 0
-			else:                                         #Else necessário!!! Usado para dar tempo de mudar a imagem da espada
-				return
-		self.inAtack = True
-		self.ifHit = False
-		if self.weapon.contadorImageAtual == 6:
-			self.weapon.changeWeaponImageAtual(5)
-		elif self.weapon.contadorImageAtual == 3:
-			self.weapon.changeWeaponImageAtual(2)
-		#self.weapon.changeWeapon()
-		print ("ATACK")
+	def draw(self, camera):
+		camera.drawScreenFix(self.__currentImagePlayer, (self.settings.screen_width/2, self.settings.valuePosY-self.__rectPlayer.h+self.__rectPlayer.y))
 
-	def draw(self, background):
-		if self.weapon.contadorImageAtual == 5 or self.weapon.contadorImageAtual == 2:
-			if not self.posMouseRight:
-				background.blit(self.weapon.weaponAtual,(self.rect.x-10,self.rect.y+25))
-			else:
-				background.blit(self.weapon.weaponAtual,(self.rect.x+self.rect.w/2+10,self.rect.y+25))
-		else:
-			if not self.posMouseRight:
-				background.blit(self.weapon.weaponAtual,(self.rect.x,self.rect.y+20))
-			else:
-				background.blit(self.weapon.weaponAtual,(self.rect.x+self.rect.w/2,self.rect.y+20))
-		background.blit(self.image, (self.rect.x, self.rect.y), (self.__vectorPosX[self.currentImage],self.__vectorPosY[self.currentImage],96,96))
-
-
-	def __setImagensPositions(self):
-		self.__vectorPosX[0] = 0
-		self.__vectorPosX[1] = 96
-		self.__vectorPosX[2] = 192
-		self.__vectorPosX[3] = 0
-		self.__vectorPosX[4] = 96
-		self.__vectorPosX[5] = 192
-		self.__vectorPosX[6] = 96
-
-		self.__vectorPosY[0] = 96
-		self.__vectorPosY[1] = 96
-		self.__vectorPosY[2] = 96
-		self.__vectorPosY[3] = 192
-		self.__vectorPosY[4] = 192
-		self.__vectorPosY[5] = 192
-		self.__vectorPosY[6] = 0
-
-	def update(self):
-		self.__updateMousePosition()
-		self.__contadores()                  #Atualiza contadores importantes
-		if self.inMoving:
-			if self.__verificaExtremos():    #Se o personagem não está nos extremos entra no if
-				self.__step()                #Move o personagem
-		if self.inJump:
-			self.__jump()                    #Pula
-
-		self.__updateCurrentImage()  #Altera a imagem do personagem se movendo
-		self.__updateCurrentWeaponImage()
-
-	def __step(self):
-		if self.velocidadeJogador < 0 and not self.colisionLeft:    #Verifica se o jogador está se movendo para a esquerda e se não está colidindo pela esquerda
-			self.settings.posX += self.velocidadeJogador            #Altera a posição do jogador (Na real altera a posição posX que é do background, o personagem é fixo no meio do background)
-		elif self.velocidadeJogador > 0 and not self.colisionRight:
-			self.settings.posX += self.velocidadeJogador
+	def getRectPlayer(self):
+		tempRect = self.__rectPlayer.copy()
+		tempRect.x = self.getPlayerPosX()
+		return tempRect
 
 	def colisionMob(self, mob):
 		if self.inJump:                   #Se está pulando não faz a checagem de colisão
-			mob.inMoving = True           #Faz o mob voltar a se mover
-			self.removeColision()    #Remove as colisoes
+			self.removeColision()    	  #Remove as colisoes
 			return
-		self.__checkColision(mob)
+		self.__checkColisionMob(mob)
 		
 	def colisionWeapon(self,mob):
 		self.__checkColisionAtack(mob)
@@ -205,47 +220,22 @@ class Player(pygame.sprite.Sprite):
 				mob.currentMobPosX += self.weapon.weaponKnockBack
 				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
 
-	def __checkColision(self, mob):
-		self.tempMobRect = mob.getRectMob().copy()
-		#print ("Xplayer = %d Xmob = %d Yplayer = %d Ymob = %d" %(self.rect.x, self.tempMobRect.x, self.rect.y, self.tempMobRect.y))
+	def __checkColisionMob(self, mob):
+		#Ignora a posY
+		tempMobRect = mob.getRectMob().copy()
+		tempMobRect.y = self.getRectPlayer().y
 		if mob.mobVelocity > 0:
-			if self.rect.colliderect(self.tempMobRect):                #Verifica a colisão entre o player e o rect
+			if self.getRectPlayer().colliderect(tempMobRect):                #Verifica a colisão entre o player e o rect
 				self.__setDamage(mob.mobDamage)
-				mob.inMoving = False
 				self.colisionLeft = True
-				#print ("Left")
-			elif not mob.inMoving:
+			else:
 				self.colisionLeft = False
-				mob.inMoving = True
 		elif mob.mobVelocity < 0:
-			if self.tempMobRect.colliderect(self.rect):                #Verifica a colisão entre o mod e o player
+			if tempMobRect.colliderect(self.getRectPlayer()):                #Verifica a colisão entre o mod e o player
 				self.__setDamage(mob.mobDamage)
-				mob.inMoving = False
 				self.colisionRight = True
-				#print ("Right")
-			elif not mob.inMoving:
+			else:
 				self.colisionRight = False
-				mob.inMoving = True
-
-	def __verificaExtremos(self):
-		#Verifica se chegou no extremo do mapa
-		#0 é o limite da direita e 4200 o limite da esquerda
-		if self.settings.posX + self.velocidadeJogador < 0:
-			self.currentImage = 6
-			return False
-		if self.settings.posX + self.velocidadeJogador > 4200:
-			self.currentImage = 6
-			return False
-		return True    #Se não está no limite retorna True, caso contrario retorna False
-
-	def __updateMousePosition(self):
-		#Muda a variavel de controle para verificar a posição do mouse na tela
-		metadeTelaX = int(self.rect.x + self.rect.w/2)
-		#pygame.mouse.get_pos()[0] pega a posição X do cursor do mouse atual
-		if pygame.mouse.get_pos()[0] > metadeTelaX:
-			self.posMouseRight = True
-		else:
-			self.posMouseRight = False
 
 	def __updateCurrentWeaponImage(self):
 		if self.inAtack:
@@ -265,88 +255,21 @@ class Player(pygame.sprite.Sprite):
 				if self.weapon.contadorImageAtual > 3:
 					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual-3)
 
-	def __updateCurrentImage(self):
-		if not self.inMoving:   #Caso não esteja se movendo apenas muda a imagem para seu reflexo
-			if not self.posMouseRight and self.currentImage > 2:
-				self.currentImage -= 3
-			elif self.posMouseRight and self.currentImage < 3:
-				self.currentImage += 3
-			return
-
-		#Caso esteja se movendo...
-		if not self.posMouseRight:  #Caso o mouse esteja do lado direito da tela
-			if self.currentImage == 6: #Caso ele esteja no extremo oposto faz ele voltar a imagem inicial de movimento
-				self.currentImage = 0
-				return
-
-			#Caso a imagem atual seja uma de movimento para a esquerda e o personagem também está se movendo para a esquerda
-			if self.currentImage < 3:
-				#Altera para a proxima imagem do frame a cada self.__VelocidadeImage passos
-				#Ao mudar a imagem, reseta o contador. Se não mudar, incrementa o contador
-				if self.contadorImage == self.__VelocidadeImage:
-					self.currentImage = (self.currentImage+1) % 3
-					self.contadorImage = 0
-				self.contadorImage += 1
-			#Caso a imagem atual seja uma de movimento para a direita e o personagem está se movendo para a esquerda
-			#Apenas reseta a imagem para a imagem inicial de movimento
-			else:
-				self.currentImage = 0
-				self.contadorImage = 0
-		else:   #Caso o mouse esteja do lado esquerdo da tela
-			if self.currentImage == 6:     #Caso ele esteja no extremo oposto faz ele voltar a imagem inicial de movimento
-				self.currentImage = 3
-				return
-
-			#Caso a imagem atual seja uma de movimento para a direita e o personagem também está se movendo para a direita
-			if self.currentImage > 2:
-				if self.contadorImage == self.__VelocidadeImage:
-					self.currentImage = ((self.currentImage+1) % 3) + 3
-					self.contadorImage = 0
-				self.contadorImage += 1
-			else:
-				self.currentImage = 3
-				self.contadorImage = 0
-
-	def __jump(self):
-		#Verifica se está no limite do pulo e se mantém por mais self.__duracaoAirJump no ar
-		if self.inAirJump and not self.contadorAirJump == self.__duracaoAirJump:
-			self.contadorAirJump += 1
-			return
-		
-		if self.inInverseJump:                            #Verifica se está caindo (Pulou, chegou no topo e está caindo)
-			self.rect.y += self.settings.velocityJump
-			self.contadorJump -= 1
-		else:
-			self.rect.y -= self.settings.velocityJump
-			self.contadorJump += 1
-
-		if self.contadorJump == self.__duracaoJump:  #Verifica se pulou até chegar no topo
-			self.inInverseJump = True                #Variavel para começar a descer do pulo
-			self.inAirJump = True                    #Variavel para se manter no ar por um tmepo
-			self.contadorAirJump = 0				 #Reseta o contador
-		elif self.contadorJump == 0:                 #Verifica se tocou o chão
-			self.inInverseJump = False               #Reseta as variaveis de pulo para False // Acabou o pulo
-			self.inJump = False
-			self.inAirJump = False
-	
-	def __contadores(self):
-		#Atualiza contadores que dependem do jogo rodar e não de outras variaveis externas
-		if self.contadorInDamage < self.__imunityTime:
-			self.contadorInDamage += 1
-		if self.contadorAtackDelay < self.weapon.weaponDelay:
-			self.contadorAtackDelay += 1
-		if self.contadorWeaponDelay < self.weapon.weaponImageDelay:
-			self.contadorWeaponDelay += 1
-
 	def __setDamage(self, damage):
 		if self.inDamage:                       #Se já levou dano e está no tempo de invunerabilidade
-			if self.contadorInDamage == self.__imunityTime:
+			#A variabel contador de imunidade é incrementada no update de contadores
+			if self.countImunityTime >= self.playerImunityTime:
 				self.inDamage = False
+				self.countImunityTime = 0
 		else:
 			self.inDamage = True
-			self.contadorInDamage = 0
-			if self.vidaJogador - damage <= 0:
-				self.vidaJogador = 0
-				self.settings.gameOver = 1
+			self.countImunityTime = 0
+			if self.playerLife - damage <= 0:
+				self.playerLife = 0
 			else:
-				self.vidaJogador -= damage
+				self.playerLife -= damage
+
+			if self.settings.generalInfo:
+				print ("Damage %d | Life %d" % (damage, self.playerLife))
+
+			
