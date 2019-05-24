@@ -273,7 +273,7 @@ class Settings:
 		#Verifica se o NPC possui imagem de Loja fechada
 		self.npcHaveClosed.append(True)
 		self.npcHaveClosed.append(True)
-		self.npcHaveClosed.append(False)
+		self.npcHaveClosed.append(True)
 
 	def getNPCHaveClosed(self, npcID):
 		return self.npcHaveClosed[npcID]
