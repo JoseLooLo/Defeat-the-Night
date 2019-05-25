@@ -134,6 +134,8 @@ class Game:
 					for npc in self.listNPC.sprites():
 						if npc.colisionPlayer:
 							npc.sell(self.player)
+				if event.key == pygame.K_ESCAPE:
+					sys.exit()
 
 
 	def __updateObject(self):
