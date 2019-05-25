@@ -34,14 +34,15 @@ class Font:
             try:
                 self.font = pygame.font.SysFont(self.fontName, self.fontSize)
             except:
+                print ("Erro ao carregar a fonte %s. Arquivo não localizado" % (self.fontName))
                 self.__resetFont()
         else:
             fullname = os.path.join('data','Fonts')
             fullname = os.path.join(fullname, self.fontName)
-            print (fullname)
             try:
                 self.font = pygame.font.Font(fullname, self.fontSize)
             except:
+                print ("Erro ao carregar a fonte %s. Arquivo não localizado" % (self.fontName))
                 self.__resetFont()
 
     

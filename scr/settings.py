@@ -30,6 +30,7 @@ class Settings:
 			pygame.mixer.init(44100, -16,2,2048)
 			self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
 		except:
+			print ("Erro ao iniciar o módulo de Som e/ou carregar alguns sons")
 			self.soundEnable = False
 
 	def __createFont(self):
@@ -347,7 +348,6 @@ class Settings:
 		try:
 			image = pygame.image.load(fullname)
 		except:
-			#print ("Não foi possivel abrir a imagem %s" % (fullname))
 			raise Exception("Não foi possivel abrir a imagem %s" % (fullname))
 
 		image = image.convert()
