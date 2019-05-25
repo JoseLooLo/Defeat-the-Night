@@ -1,5 +1,6 @@
 import os, sys
 import pygame
+import time
 from random import randint
 
 class Npc(pygame.sprite.Sprite):
@@ -22,12 +23,16 @@ class Npc(pygame.sprite.Sprite):
         self.qntImageNPC = self.settings.getNPCQntImages(self.npcID)  #Quantidade de imagens do NPC
         self.numCurrentImageNPC = 0          #Imagem atual / inicial do NPC
         self.numCurrentImageW = 0         #Imagem atual / inicial do W
-        self.countImageNPC = 0            #Contador para a imagem do NPC
-        self.countImageW = 0           #Contador para a imagem do W
         self.velocityImageNPC = self.settings.getNPCVelocityImages(self.npcID)  #Velocidade de troca de frames da imagem do NPC
         self.velocityImageW = self.settings.getNPCVelocityImages(self.npcID) #Velocidade de troca de frames da imagem do W
         self.haveClosed = self.settings.getNPCHaveClosed(self.npcID)
         self.colisionPlayer = False    #Colisão com o player? Adiciona ou não o W na tela
+
+        #Time
+        self.startChangeImage = time.time()
+        self.endChangeImage = time.time()
+        self.startChangeImageW = time.time()
+        self.endChangeImageW = time.time()
 
     def __createMarket(self):
         self.outOfStock = False        #Estoque vazio
@@ -101,20 +106,19 @@ class Npc(pygame.sprite.Sprite):
             self.__setImageNPCClosed()
             return
 
-        self.countImageNPC += 1
-        if self.countImageNPC == self.velocityImageNPC:
+        self.endChangeImage = time.time()
+        if self.endChangeImage - self.startChangeImage >= self.velocityImageNPC:
+            self.startChangeImage = time.time()
             self.__setProxImageNPC()
-            self.countImageNPC = 0
 
     def __updateWImage(self):
         if not self.colisionPlayer:
-            self.countImageW = 0
             self.__setImageW(0)
         else:
-            self.countImageW+=1
-            if self.countImageW == self.velocityImageW:
+            self.endChangeImageW = time.time()
+            if self.endChangeImageW - self.startChangeImageW >= self.velocityImageW:
+                self.startChangeImageW = time.time()
                 self.__setProxImageW()
-                self.countImageW = 0
 
     def __loadImages(self):
         self.__imageNPC = []

@@ -62,7 +62,7 @@ class Game:
 
 	def __spawnMobs(self):
 		for _ in range(0,1):
-			mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),1)
+			mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),0)
 			self.listMobs.add(mobs)
 
 	def __destroyMobs(self):

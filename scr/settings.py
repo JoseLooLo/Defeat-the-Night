@@ -104,11 +104,11 @@ class Settings:
 		self.playerQntImagesStop.append(4)
 
 		#Velocidade de troca de imagens do movimento do player
-		self.playerVelocityImages.append(4)
+		self.playerVelocityImages.append(0.150)
 
 		#Status do player
 		self.playerStatusDamage.append(5)
-		self.playerStatusVelocity.append(15)
+		self.playerStatusVelocity.append(5)
 		self.playerStatusLife.append(80)
 		self.playerStatusMoney.append(0)
 		self.playerStatusImunityTime.append(20)
@@ -170,8 +170,8 @@ class Settings:
 		self.mobQntImages.append(2)
 
 		#Velocidade de troca de frame
-		self.mobVelocityImages.append(7)
-		self.mobVelocityImages.append(7)
+		self.mobVelocityImages.append(0.150)
+		self.mobVelocityImages.append(0.100)
 
 		#Quantidade de moedas que dropam ao matar
 		self.mobMoneyDrop.append(2)
@@ -263,9 +263,9 @@ class Settings:
 		self.npcQntImages.append(6)
 
 		#Velocidade de troca de frame
-		self.npcVelocityImages.append(10)
-		self.npcVelocityImages.append(20)
-		self.npcVelocityImages.append(30)
+		self.npcVelocityImages.append(0.100)
+		self.npcVelocityImages.append(0.100)
+		self.npcVelocityImages.append(0.100)
 
 		#PosX dos NPC's
 		self.npcPosX.append(3600)
@@ -298,7 +298,7 @@ class Settings:
 		self.moneyQntImages.append(6)
 		
 		#Velocidade de troca de frame
-		self.moneyVelocityImages.append(10)
+		self.moneyVelocityImages.append(0.100)
 
 		#Tamanho da moeda
 		#2 = 2x menor  || 1 = Tamanho normal

@@ -1,5 +1,6 @@
 import os, sys
 import pygame
+import time
 from scr.weapon import Weapon
 
 class Player(pygame.sprite.Sprite):
@@ -23,7 +24,6 @@ class Player(pygame.sprite.Sprite):
 		self.qntImagePlayerWalk = self.settings.getPlayerQntImagesWalk(self.playerID)
 		self.qntImagePlayerStop = self.settings.getPlayerQntImagesStop(self.playerID)
 		self.numCurrentImagePlayer = 0
-		self.countImagePlayer = 0
 		self.velocityImagePlayer = self.settings.getPlayerVelocityImages(self.playerID)
 
 		#Variaveis de Status
@@ -51,6 +51,10 @@ class Player(pygame.sprite.Sprite):
 		self.colisionRight = False
 		self.colisionLeft = False
 		self.posXMouseInScreenIsRightSide = False
+
+		#Time
+		self.startChangeImage = time.time()
+		self.endChangeImage = time.time()
 
 	def __loadImages(self):
 		self.__imagePlayerWalk = []
@@ -106,11 +110,13 @@ class Player(pygame.sprite.Sprite):
 			self.countImunityTime+=1
 
 	def __updateStep(self):
-		self.countImagePlayer += 1
-		if self.countImagePlayer == self.velocityImagePlayer:
+		self.endChangeImage = time.time()
+		#print (self.endChangeImage - self.startChangeImage)
+		if self.endChangeImage - self.startChangeImage >= self.velocityImagePlayer:
+			self.startChangeImage = time.time()
 			self.__setProxImagePlayer()
+		else:
 			self.__step()
-			self.countImagePlayer = 0
 
 	def __step(self):
 		if not self.__verificaExtremos() and self.inMoving:

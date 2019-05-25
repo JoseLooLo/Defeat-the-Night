@@ -1,5 +1,6 @@
 import os, sys
 import pygame
+import time
 
 class Money(pygame.sprite.Sprite):
 
@@ -19,9 +20,12 @@ class Money(pygame.sprite.Sprite):
     def __loadVariables(self):
         self.qntImageMoney = self.settings.getMoneyQntImages(self.moneyID)
         self.numCurrentImageMoney = 0
-        self.countImageMoney = 0
         self.velocityImageMoney = self.settings.getMoneyVelocityImages(self.moneyID)
         self.zoomMoney = self.settings.getMoneyZoom(self.moneyID)
+
+        #Time
+        self.startChangeImage = time.time()
+        self.endChangeImage = time.time()
     
     def __loadImages(self):
         self.__imageMoney = []
@@ -47,10 +51,10 @@ class Money(pygame.sprite.Sprite):
         self.__updateMoneyImage()
 
     def __updateMoneyImage(self):
-        self.countImageMoney+=1
-        if self.countImageMoney == self.velocityImageMoney:
+        self.endChangeImage = time.time()
+        if self.endChangeImage - self.startChangeImage >= self.velocityImageMoney:
+            self.startChangeImage = time.time()
             self.__setProxImageMoney()
-            self.countImageMoney = 0
 
     def checkColisionPlayer(self, player):
         tempRect = self.__rectMoney.copy()

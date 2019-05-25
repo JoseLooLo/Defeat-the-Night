@@ -1,5 +1,6 @@
 import os, sys
 import pygame
+import time
 from random import randint
 
 class Mobs(pygame.sprite.Sprite):
@@ -21,7 +22,6 @@ class Mobs(pygame.sprite.Sprite):
 		#Variaveis de controle dos Frames
 		self.qntImageMob = self.settings.getMobQntImages(self.mobID)
 		self.numCurrentImageMob = 0
-		self.countImageMob = 0
 		self.velocityImageMob = self.settings.getMobVelocityImages(self.mobID)
 
 		#Variaveis de status
@@ -29,6 +29,10 @@ class Mobs(pygame.sprite.Sprite):
 		self.mobVelocity = self.settings.getMobStatusVelocity(self.mobID) + randint(0, self.settings.getMobStatusVelocityLimit(self.mobID))
 		self.mobLife = self.settings.getMobStatusLife(self.mobID) + randint(0, self.settings.getMobStatusLifeLimit(self.mobID))
 		self.mobMoney = self.settings.getMobMoneyDrop(self.mobID)
+
+		#Time
+		self.startChangeImage = time.time()
+		self.endChangeImage = time.time()
 
 		#Variaveis de controle
 		self.currentMobPosX = 4500
@@ -78,9 +82,16 @@ class Mobs(pygame.sprite.Sprite):
 
 	def update(self):
 		#Mob sempre muda a imagem de se movendo, mesmo quando esta atacando
-		self.__updateMobImage()
-		self.__step()
+		self.__updateStep()
 		self.__updateVelocity()
+
+	def __updateStep(self):
+		self.endChangeImage = time.time()
+		if self.endChangeImage - self.startChangeImage >= self.velocityImageMob:
+			self.startChangeImage = time.time()
+			self.__setProxImageMob()
+		else:
+			self.__step()
 
 	def __step(self):
 		if self.__checkColisionPlayer():
@@ -95,12 +106,6 @@ class Mobs(pygame.sprite.Sprite):
 		if tempMobRect.colliderect(self.player.getRectPlayer()):
 			return True
 		return False
-
-	def __updateMobImage(self):
-		self.countImageMob += 1
-		if self.countImageMob == self.velocityImageMob:
-			self.__setProxImageMob()
-			self.countImageMob = 0
 
 	def __updateVelocity(self):
 		#Altera a velocidade para seguir o player
