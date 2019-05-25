@@ -16,7 +16,11 @@ class Camera:
 
     def __loadVariables(self):
         self.__cameraRect = (0, 0, self.settings.screen_width, self.settings.screen_height)
-        self.__playerPos = (3850,0)
+        # -100 para subir um pouco a camera e não ficar com muito solo aparendo
+        tempY = self.__background.getHeightBackground() - self.settings.screen_height
+        if self.settings.screen_height <= 1000:
+            tempY -= 100
+        self.__playerPos = (3850,tempY)
 
     def update(self):
         self.setCameraRectPlayer(self.__playerPos)
@@ -44,6 +48,9 @@ class Camera:
 
     def getPosXplayer(self):
         return self.__playerPos[0]
+
+    def getPosYplayer(self):
+        return self.__playerPos[1]
 
     """
     draw faz o blit no background, então qualquer imagem que irá aparecer na tela deve ser gravado no draw

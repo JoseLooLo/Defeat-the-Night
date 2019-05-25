@@ -7,7 +7,10 @@ def __init():
 	pygame.init()            #Inicia o pygame
 	settings = Settings()    #Cria um objeto Setting
 	#screen = pygame.display.set_mode((0,0), pygame.RESIZABLE)  #Cria a tela
-	screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))  #Cria a tela
+	if settings.fullScreen:
+		screen = pygame.display.set_mode((settings.screen_width, settings.screen_height), pygame.FULLSCREEN)
+	else:
+		screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))  #Cria a tela
 	gameIcon = pygame.image.load(settings.gameIconName)  #Cria o Icone do jogo
 	pygame.display.set_icon(gameIcon)                    #Adiciona o Icone do jogo na screen
 	pygame.display.set_caption(settings.gameName)   #Adiciona o Nome do jogo na screen

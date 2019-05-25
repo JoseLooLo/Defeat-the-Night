@@ -51,6 +51,7 @@ class Player(pygame.sprite.Sprite):
 		self.colisionRight = False
 		self.colisionLeft = False
 		self.posXMouseInScreenIsRightSide = False
+		self.startMoviment = False
 
 		#Time
 		self.startChangeImage = time.time()
@@ -69,6 +70,7 @@ class Player(pygame.sprite.Sprite):
 
 		self.__currentImagePlayer = self.__imagePlayerStop[0]
 		self.__rectPlayer = self.__currentImagePlayer.get_rect()
+		self.__rectPlayer.y += self.camera.getPosYplayer()
 
 	def __setImagePlayerWalk(self, numImg):
 		self.__currentImagePlayer = self.__imagePlayerWalk[numImg]
@@ -87,6 +89,7 @@ class Player(pygame.sprite.Sprite):
 			else:
 				self.__setImagePlayerWalk(self.numCurrentImagePlayer + 1)
 		else:
+			self.startMoviment = False
 			if self.numCurrentImagePlayer == self.qntImagePlayerStop -1:
 				self.__setImagePlayerStop(0)
 			else:
@@ -111,12 +114,14 @@ class Player(pygame.sprite.Sprite):
 
 	def __updateStep(self):
 		self.endChangeImage = time.time()
-		#print (self.endChangeImage - self.startChangeImage)
 		if self.endChangeImage - self.startChangeImage >= self.velocityImagePlayer:
 			self.startChangeImage = time.time()
 			self.__setProxImagePlayer()
-		else:
+		elif (self.numCurrentImagePlayer >= 1 or self.startMoviment) and self.inMoving:
+			self.startMoviment = True
 			self.__step()
+		#elif self.numCurrentImagePlayer != 0:
+		#	self.__step()
 
 	def __step(self):
 		if not self.__verificaExtremos() and self.inMoving:
@@ -143,7 +148,7 @@ class Player(pygame.sprite.Sprite):
 		if self.countInJumpUp - self.playerStatusDefaultJumpTime > 0:
 			self.countInJumpUp -= self.playerStatusDefaultJumpTime
 			self.countInJumpDown += self.playerStatusDefaultJumpTime
-			self.__rectPlayer.y -= self.playerStatusDefaultJumpTime
+			self.__rectPlayer.y += self.playerStatusDefaultJumpTime
 		else:
 			if self.countInJumpDown == 0:
 				self.inJump = False
@@ -151,7 +156,7 @@ class Player(pygame.sprite.Sprite):
 				self.countInJumpDown = 0
 			else:
 				self.countInJumpDown -= self.playerStatusDefaultJumpTime
-				self.__rectPlayer.y += self.playerStatusDefaultJumpTime
+				self.__rectPlayer.y -= self.playerStatusDefaultJumpTime
 
 	def __updateMousePosition(self):
 		#Muda a variavel de controle para verificar a posição do mouse na tela
@@ -180,7 +185,7 @@ class Player(pygame.sprite.Sprite):
 		self.weaponAtual.add(self.weapon)
 
 	def draw(self, camera):
-		camera.drawScreenFix(self.__currentImagePlayer, (self.settings.screen_width/2, self.settings.valuePosY-self.__rectPlayer.h+self.__rectPlayer.y))
+		camera.drawScreenFix(self.__currentImagePlayer, (self.settings.screen_width/2, self.settings.valuePosY-self.__rectPlayer.h-self.__rectPlayer.y))
 
 	def getRectPlayer(self):
 		tempRect = self.__rectPlayer.copy()

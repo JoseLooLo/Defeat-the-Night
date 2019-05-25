@@ -14,14 +14,16 @@ class Background(pygame.sprite.Sprite):
     def __init(self):
         self.__loadVariables()
         self.__loadImages()
+        self.__loadSurface()
         self.__loadPosBackground()
 
-    def __loadVariables(self):
+    def __loadSurface(self):
         #Cria o suface do background << IMPORTANTE
-        self.background = pygame.Surface((8648,650))
+        self.background = pygame.Surface((self.__currentImageBackground.get_rect().w,self.__currentImageBackground.get_rect().h))
         self.background = self.background.convert()
         self.background.fill(self.settings.backgroundFillColor)
 
+    def __loadVariables(self):
         self.qntImageBackground = self.settings.getBackgroundQntImages(self.backgroundID)
 
     def __loadImages(self):
@@ -36,6 +38,9 @@ class Background(pygame.sprite.Sprite):
     def __loadPosBackground(self):
         self.__posXBackground = int((self.__currentImageBackground.get_size()[0] - self.settings.screen_width)/2)
         self.__posYBackground = 380
+
+    def getHeightBackground(self):
+        return self.__currentImageBackground.get_rect().h
 
     def getSizeCurrentImageBackground(self):
         return self.__currentImageBackground.get_size()

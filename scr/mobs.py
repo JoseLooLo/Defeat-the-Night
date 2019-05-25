@@ -35,7 +35,7 @@ class Mobs(pygame.sprite.Sprite):
 		self.endChangeImage = time.time()
 
 		#Variaveis de controle
-		self.currentMobPosX = 4500
+		self.currentMobPosX = 4200
 
 		if self.settings.generalInfo:
 			print ("New Mob ID = %d | posX %d | Dmg %d | Vel %d | HP %d " % (self.mobID, self.currentMobPosX, self.mobDamage, self.mobVelocity, self.mobLife))

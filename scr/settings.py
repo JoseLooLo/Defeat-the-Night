@@ -9,23 +9,81 @@ class Settings:
 		#Configurações gerais
 		self.screen_width = 900
 		self.screen_height = 650
+		self.fullScreen = False
 		self.gameName = "Defeat the Night"
+
+		#Configuração de Som
+		self.soundEnable = True
+		self.soundVolume = 1
 
 		#Icon
 		self.gameIconName = "icon.png"
 
-		#Configurações gerais
-		self.valuePosY = 354             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
+		#Configurações gerais 354
+		self.valuePosY = 835             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
 
 		self.__init()
 
 	def __init(self):
+		self.__loadConfig()
 		self.__loadSound()
 		self.__loadVariables()           #Cria as variáveis
 		self.__createFont()              #Cria as fontes
 
-	def __loadSound(self):
+	def __loadConfig(self):
+		try:
+			arquivoConfig = open("dtn.conf","r")
+			for linha in arquivoConfig:
+				valores = linha.split()
+				self.__updateConfig(valores[0], valores[2])
+			arquivoConfig.close()
+		except:
+			self.__resetConfig()
+			self.__createNewConfig()
+
+	def __updateConfig(self, configName, configValue):
+		try:
+			if configName == "ResolutionW":
+				self.screen_width = int(configValue)
+			if configName == "ResolutionH":
+				self.screen_height = int(configValue)
+			if configName == "FullScreen":
+				if configValue == "FALSE":
+					self.fullScreen = False
+				elif configValue == "TRUE":
+					self.screen_width = pygame.display.Info().current_w
+					self.screen_height = pygame.display.Info().current_h
+					self.fullScreen = True
+			if configName == "EnableSound":
+				if configValue == "FALSE":
+					self.soundEnable = False
+				elif configValue == "TRUE":
+					self.soundEnable = True
+			if configName == "SoundVolume":
+				self.soundVolume = int(configValue)
+		except:
+			self.__resetConfig()
+			self.__createNewConfig()
+
+	def __resetConfig(self):
+		self.screen_width = 900
+		self.screen_height = 650
+		self.fullScreen = False
 		self.soundEnable = True
+		self.soundVolume = 1
+
+	def __createNewConfig(self):
+		arquivoConfig = open('dtn.conf', 'w')
+		texto = []
+		texto.append('ResolutionW = ',self.screen_width,'\n')
+		texto.append('ResolutionH = ',self.screen_height,'\n')
+		texto.append('FullScreen = TRUE\n')
+		texto.append('EnableSound = TRUE\n')
+		texto.append('SoundVolume = ',self.soundVolume,'\n')
+		arquivoConfig.writelines(texto)
+		arquivoConfig.close()
+
+	def __loadSound(self):
 		try:
 			pygame.mixer.init(44100, -16,2,2048)
 			self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
