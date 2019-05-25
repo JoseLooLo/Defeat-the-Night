@@ -199,10 +199,12 @@ class Npc(pygame.sprite.Sprite):
                 self.marketQntItensBuyDay+=1
                 self.marketQntItensBuyAll+=1
                 print("Buy %s | Price %d" % (self.itemName[self.itemIDToday], self.itemPrice[self.itemIDToday]))
-        #else:
-            #self.settings.sounda.play()
+        else:
+            if self.settings.soundEnable:
+                self.settings.sounda.play()
         self.__checkBuyAll()
 
     def sellNPCPotions(self, player):
-        #self.settings.sounda.play()
+        if self.settings.soundEnable:
+            self.settings.sounda.play()
         self.outOfStock = True

@@ -14,16 +14,23 @@ class Settings:
 		#Icon
 		self.gameIconName = "icon.png"
 
-		#self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
-
 		#Configurações gerais
 		self.valuePosY = 354             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
 
 		self.__init()
 
 	def __init(self):
+		self.__loadSound()
 		self.__loadVariables()           #Cria as variáveis
 		self.__createFont()              #Cria as fontes
+
+	def __loadSound(self):
+		self.soundEnable = True
+		try:
+			pygame.mixer.init(44100, -16,2,2048)
+			self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
+		except:
+			self.soundEnable = False
 
 	def __createFont(self):
 		""" Fontes disponíveis"""

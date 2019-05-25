@@ -5,7 +5,6 @@ from scr.game import Game
 
 def __init():
 	pygame.init()            #Inicia o pygame
-	#pygame.mixer.init(44100, -16,2,2048)
 	settings = Settings()    #Cria um objeto Setting
 	#screen = pygame.display.set_mode((0,0), pygame.RESIZABLE)  #Cria a tela
 	screen = pygame.display.set_mode((settings.screen_width, settings.screen_height))  #Cria a tela
