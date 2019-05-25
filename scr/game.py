@@ -62,13 +62,13 @@ class Game:
 
 	def __spawnMobs(self):
 		for _ in range(0,1):
-			mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),0)
+			mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),1)
 			self.listMobs.add(mobs)
 
 	def __destroyMobs(self):
 		for mob in self.listMobs.sprites():
 			self.listMobs.remove(mob)
-			self.__createMoney(0,mob.getRectMob().x+mob.getRectMob().w/2,1)
+			self.__createMoney(0,mob.getRectMob().x+mob.getRectMob().w/2,mob.mobMoney)
 			del mob
 
 	def __checkColision(self):
@@ -194,6 +194,7 @@ class Game:
 		if self.settings.generalInfo:
 			print("New day")
 		self.__destroyMobs()
+		self.player.removeColision()
 		for npc in self.listNPC.sprites():
 			npc.resetMarketDay()
 

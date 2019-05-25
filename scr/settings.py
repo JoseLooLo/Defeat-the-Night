@@ -163,17 +163,25 @@ class Settings:
 
 		#Nome de cada tipo de mob
 		self.mobName.append("Slime")
+		self.mobName.append("Jailton")
 
 		#Quantidade de frames cada tipo de Mob possui
 		self.mobQntImages.append(8)
+		self.mobQntImages.append(2)
 
 		#Velocidade de troca de frame
+		self.mobVelocityImages.append(7)
 		self.mobVelocityImages.append(7)
 
 		#Quantidade de moedas que dropam ao matar
 		self.mobMoneyDrop.append(2)
+		self.mobMoneyDrop.append(2)
 
 		#Status dos mobs
+		self.mobStatusDamage.append(1)
+		self.mobStatusVelocity.append(1)
+		self.mobStatusLife.append(10)
+
 		self.mobStatusDamage.append(1)
 		self.mobStatusVelocity.append(1)
 		self.mobStatusLife.append(10)
@@ -184,17 +192,12 @@ class Settings:
 		self.mobStatusVelocityLimit.append(1)
 		self.mobStatusLifeLimit.append(30)
 
-		"""Variaveis para alterar"""
-		#Aumentar em até X os valores dos status do mob
-		# self.randomVelocidadeMob = 2
-		# self.randomDamageMob = 10
-		# self.randomLifeMob = 30
-		# self.randomMenorPosXMob = -2100
-		# self.randomMaiorPosXMob = 2100
+		self.mobStatusDamageLimit.append(1)
+		self.mobStatusVelocityLimit.append(1)
+		self.mobStatusLifeLimit.append(30)
 
-		# self.imageMob1W = 96
-		# self.imageMob1H = 96
-		# self.colisionDiferenceMob1 = 45
+	def getMobMoneyDrop(self, mobID):
+		return self.mobMoneyDrop[mobID]
 
 	def getMobStatusDamage(self, mobID):
 		return self.mobStatusDamage[mobID]

@@ -28,6 +28,7 @@ class Mobs(pygame.sprite.Sprite):
 		self.mobDamage = self.settings.getMobStatusDamage(self.mobID) + randint(0,self.settings.getMobStatusDamageLimit(self.mobID))
 		self.mobVelocity = self.settings.getMobStatusVelocity(self.mobID) + randint(0, self.settings.getMobStatusVelocityLimit(self.mobID))
 		self.mobLife = self.settings.getMobStatusLife(self.mobID) + randint(0, self.settings.getMobStatusLifeLimit(self.mobID))
+		self.mobMoney = self.settings.getMobMoneyDrop(self.mobID)
 
 		#Variaveis de controle
 		self.currentMobPosX = 4500
