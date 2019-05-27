@@ -154,6 +154,7 @@ class Game:
 		self.__blitAndResetScreen()
 		self.__drawObject()
 		self.__drawText()
+		#pygame.display.flip()
 
 	def __blitAndResetScreen(self):
 		self.__camera.drawScreen()

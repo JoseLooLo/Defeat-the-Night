@@ -120,8 +120,6 @@ class Player(pygame.sprite.Sprite):
 		elif (self.numCurrentImagePlayer >= 1 or self.startMoviment) and self.inMoving:
 			self.startMoviment = True
 			self.__step()
-		#elif self.numCurrentImagePlayer != 0:
-		#	self.__step()
 
 	def __step(self):
 		if not self.__verificaExtremos() and self.inMoving:
