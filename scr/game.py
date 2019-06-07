@@ -15,6 +15,7 @@ class Game:
 	def __init__(self, settings, screen):
 		self.settings = settings
 		self.screen = screen
+		self.clockFPS = pygame.time.Clock()
 
 		self.__init()
 
@@ -49,7 +50,6 @@ class Game:
 		self.__camera = Camera(self.settings, self.screen)
 	
 	def __gameLoop(self):
-		self.clockFPS = pygame.time.Clock()
 		self.__spawnMobs()
 		#Loop do jogo
 		while 1:
@@ -108,8 +108,8 @@ class Game:
 	def __checkEvents(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT: sys.exit()
-			# if event.type == pygame.MOUSEBUTTONUP:
-			# 	self.player.atack()
+			if event.type == pygame.MOUSEBUTTONUP:
+				self.player.attack()
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_d:
 					self.player.setInMoving(False)
@@ -129,7 +129,7 @@ class Game:
 						self.player.playerVelocity *= -1
 					self.player.setInMoving(True)
 				if event.key == pygame.K_SPACE:
-					self.player.inJump = True
+					self.player.setInJump(True)
 				if event.key == pygame.K_w:
 					for npc in self.listNPC.sprites():
 						if npc.colisionPlayer:
@@ -154,7 +154,6 @@ class Game:
 		self.__blitAndResetScreen()
 		self.__drawObject()
 		self.__drawText()
-		#pygame.display.flip()
 
 	def __blitAndResetScreen(self):
 		self.__camera.drawScreen()
@@ -208,7 +207,7 @@ class Game:
 		self.__spawnMobs()
 
 	def __createSpritesHUD(self):
-		self.hud = Hud(self.settings, self.player, self.__camera)
+		self.hud = Hud(self.settings, self.clockFPS, self.player, self.__camera)
 
 	def __createSpritesPlayer(self):
 		self.player = Player(self.settings, self.__camera, 0)

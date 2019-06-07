@@ -23,6 +23,7 @@ class Player(pygame.sprite.Sprite):
 		#Variaveis de controle dos Frames
 		self.qntImagePlayerWalk = self.settings.getPlayerQntImagesWalk(self.playerID)
 		self.qntImagePlayerStop = self.settings.getPlayerQntImagesStop(self.playerID)
+		self.qntImagePlayerAttack = self.settings.getPlayerQntImagesAttack(self.playerID) 
 		self.numCurrentImagePlayer = 0
 		self.velocityImagePlayer = self.settings.getPlayerVelocityImages(self.playerID)
 
@@ -48,6 +49,7 @@ class Player(pygame.sprite.Sprite):
 		self.inJump = False
 		self.inAirJump = False
 		self.inDamage = False                  #Verifica se está dentro do tempo de invulnerabilidade 
+		self.inAtack = False
 		self.colisionRight = False
 		self.colisionLeft = False
 		self.posXMouseInScreenIsRightSide = False
@@ -68,6 +70,11 @@ class Player(pygame.sprite.Sprite):
 			tempImage = self.settings.load_Images("stopped"+str(i)+".png", "Player/ID"+str(self.playerID), -1)
 			self.__imagePlayerStop.append(tempImage)
 
+		self.__imagePlayerAttack = []
+		for i in range(self.qntImagePlayerAttack):
+			tempImage = self.settings.load_Images("attack"+str(i)+".png", "Player/ID"+str(self.playerID), -1)
+			self.__imagePlayerAttack.append(tempImage)
+
 		self.__currentImagePlayer = self.__imagePlayerStop[0]
 		self.__rectPlayer = self.__currentImagePlayer.get_rect()
 		self.__rectPlayer.y += self.camera.getPosYplayer()
@@ -82,7 +89,27 @@ class Player(pygame.sprite.Sprite):
 		self.numCurrentImagePlayer = numImg
 		self.__flipImage()
 
+	def __setImagePlayerAttack(self, numImg):
+		self.__currentImagePlayer = self.__imagePlayerAttack[numImg]
+		self.numCurrentImagePlayer = numImg
+		self.__flipImage()
+
 	def __setProxImagePlayer(self):
+		#Maquinas de estado do player, não podem ser chamadas ao mesmo
+		if self.inAtack:
+			self.__setProxImagePlayerAttack()
+		else:
+			self.__setProxImagePlayerMoving()
+
+	def __setProxImagePlayerAttack(self):
+		if self.numCurrentImagePlayer == self.qntImagePlayerAttack -1:
+			self.inAtack = False
+			self.numCurrentImagePlayer = 0
+			#self.__setImagePlayerAttack(0)
+		else:
+			self.__setImagePlayerAttack(self.numCurrentImagePlayer + 1)
+
+	def __setProxImagePlayerMoving(self):
 		if self.inMoving:
 			if self.numCurrentImagePlayer == self.qntImagePlayerWalk -1:
 				self.__setImagePlayerWalk(0)
@@ -96,8 +123,14 @@ class Player(pygame.sprite.Sprite):
 				self.__setImagePlayerStop(self.numCurrentImagePlayer + 1)
 
 	def setInMoving(self, inMoving):
-		self.inMoving = inMoving
-		self.numCurrentImagePlayer = 0
+		if not self.inAtack:
+			self.inMoving = inMoving
+			self.numCurrentImagePlayer = 0
+		elif not inMoving:
+			self.inMoving = inMoving
+
+	def setInJump(self, inJump):
+		self.inJump = inJump
 
 	def getPlayerPosX(self):
 		return self.camera.getPosXplayer() + self.settings.screen_width/2
@@ -281,4 +314,8 @@ class Player(pygame.sprite.Sprite):
 			if self.settings.generalInfo:
 				print ("Damage %d | Life %d" % (damage, self.playerLife))
 
-			
+	def attack(self):
+		if self.inJump or self.inAtack:
+			return
+		self.inAtack = True
+		self.numCurrentImagePlayer = 0

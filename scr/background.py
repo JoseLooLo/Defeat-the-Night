@@ -58,4 +58,4 @@ class Background(pygame.sprite.Sprite):
         return self.background
 
     def draw(self):
-        self.background.blit(self.__currentImageBackground, (0,0))
+        self.background.blit(self.__currentImageBackground, (self.camera.getCameraRect()[0]-30,self.camera.getCameraRect()[1]), (self.camera.getCameraRect()[0]+30,self.camera.getCameraRect()[1],self.settings.screen_width+60,self.settings.screen_height))

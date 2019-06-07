@@ -3,9 +3,10 @@ import pygame
 
 class Hud(pygame.sprite.Sprite):
 
-    def __init__(self, settings, player, camera):
+    def __init__(self, settings, fps, player, camera):
         pygame.sprite.Sprite.__init__(self)
         self.settings = settings
+        self.fps = fps
         self.player = player
         self.camera = camera
 
@@ -41,11 +42,13 @@ class Hud(pygame.sprite.Sprite):
         self.textDamage = self.settings.fontGeneral.font.render(str(self.player.playerDamage), 1, self.HUDDamageColor)
         self.textSpeed = self.settings.fontGeneral.font.render(str(abs(self.player.playerVelocity)), 1, self.HUDSpeedColor)
         self.textCoin = self.settings.fontGeneral.font.render(str(self.player.playerMoney), 1, self.HUDCoinColor)
+        self.textFPS = self.settings.fontGeneral.font.render(str(int(self.fps.get_fps())), 1, self.settings.color_white)
 
     def update(self):
         self.__updateTexts()
 
     def draw(self, camera):
+        camera.drawScreenFix(self.textFPS,(1,250))
         if self.showPosInHUD:
             camera.drawScreenFix(self.textPosX,(0,0))
             camera.drawScreenFix(self.textPosY,(0,25))

@@ -151,6 +151,7 @@ class Settings:
 		self.playerName = []
 		self.playerQntImagesWalk = []
 		self.playerQntImagesStop = []
+		self.playerQntImagesAttack = []
 		self.playerVelocityImages = []
 		self.playerStatusDamage = []
 		self.playerStatusVelocity = []
@@ -169,6 +170,9 @@ class Settings:
 		#Qnt de imagens da skin parado
 		self.playerQntImagesStop.append(4)
 
+		#Qnt de imgens da skin atacando
+		self.playerQntImagesAttack.append(11)
+
 		#Velocidade de troca de imagens do movimento do player
 		self.playerVelocityImages.append(0.150)
 
@@ -183,6 +187,9 @@ class Settings:
 		self.playerStatusVelocityJump.append(1)
 		self.playerStatusHeightJump.append(200)
 		self.playerStatusDefaultJumpTime = 7
+
+	def getPlayerQntImagesAttack(self, playerID):
+		return self.playerQntImagesAttack[playerID]
 
 	def getPlayerQntImagesWalk(self, playerID):
 		return self.playerQntImagesWalk[playerID]

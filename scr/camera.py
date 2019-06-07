@@ -28,6 +28,9 @@ class Camera:
     def setPlayerPos(self, playerPos):
         self.__playerPos = playerPos
 
+    def getCameraRect(self):
+        return self.__cameraRect
+
     def addPlayerPosX(self, playerPosX):
         self.setPlayerPos((self.__playerPos[0] + playerPosX, self.__playerPos[1]))
 
@@ -77,8 +80,9 @@ class Camera:
     """
     def drawScreen(self):
         self.update()
-        self.__screen.blit(self.__background.getBackgroundSurface(), (0,0), self.__cameraRect)
+        self.__screen.blit(self.__background.getBackgroundSurface(), (0,0), self.getCameraRect())
         self.drawBackgroundImage()
+        
 
     def drawBackgroundImage(self):
         self.__background.draw()
