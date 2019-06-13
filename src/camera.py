@@ -1,6 +1,6 @@
 import os, sys
 import pygame
-from scr.background import Background
+from src.background import Background
 
 class Camera:
 

@@ -1,6 +1,6 @@
 import os, sys
 import pygame
-from scr.font import Font
+from src.font import Font
 
 class Settings:
 
@@ -152,6 +152,7 @@ class Settings:
 		self.playerQntImagesWalk = []
 		self.playerQntImagesStop = []
 		self.playerQntImagesAttack = []
+		self.playerQntImagesJump = []
 		self.playerVelocityImages = []
 		self.playerStatusDamage = []
 		self.playerStatusVelocity = []
@@ -173,6 +174,9 @@ class Settings:
 		#Qnt de imgens da skin atacando
 		self.playerQntImagesAttack.append(11)
 
+		#Qnt de imagens da skin pulando
+		self.playerQntImagesJump.append(10)
+
 		#Velocidade de troca de imagens do movimento do player
 		self.playerVelocityImages.append(0.150)
 
@@ -184,9 +188,12 @@ class Settings:
 		self.playerStatusImunityTime.append(20)
 
 		#Jump
-		self.playerStatusVelocityJump.append(1)
-		self.playerStatusHeightJump.append(200)
-		self.playerStatusDefaultJumpTime = 7
+		self.playerStatusVelocityJump.append(2)
+		self.playerStatusHeightJump.append(250)
+		self.playerStatusDefaultJumpTime = 6
+
+	def getPlayerQntImagesJump(self, playerID):
+		return self.playerQntImagesJump[playerID]
 
 	def getPlayerQntImagesAttack(self, playerID):
 		return self.playerQntImagesAttack[playerID]
@@ -333,7 +340,7 @@ class Settings:
 		#Quantidade de frames cada NPC possui
 		self.npcQntImages.append(14)
 		self.npcQntImages.append(14)
-		self.npcQntImages.append(6)
+		self.npcQntImages.append(25)
 
 		#Velocidade de troca de frame
 		self.npcVelocityImages.append(0.100)

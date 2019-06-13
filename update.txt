@@ -1,1 +1,5 @@
 --Atualizações 
+    Alterado o nome da pasta "scr" para "src"
+    Substituido as imagens do NPC 3 (Rodolfo) - 25 imagens
+    Adicionado as imagens do Pulo - 10 imagens
+    Alterado o módulo do pulo | Incompleto

@@ -1,13 +1,13 @@
 import os, sys
 import pygame
-from scr.player import Player
-from scr.mobs import Mobs
-from scr.npc import Npc
-from scr.money import Money
-from scr.time import Time
-from scr.background import Background
-from scr.hud import Hud
-from scr.camera import Camera
+from src.player import Player
+from src.mobs import Mobs
+from src.npc import Npc
+from src.money import Money
+from src.time import Time
+from src.background import Background
+from src.hud import Hud
+from src.camera import Camera
 from random import randint
 
 class Game:

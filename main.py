@@ -1,7 +1,7 @@
 import os, sys
 import pygame
-from scr.settings import Settings
-from scr.game import Game
+from src.settings import Settings
+from src.game import Game
 
 def __init():
 	pygame.init()            #Inicia o pygame
