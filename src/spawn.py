@@ -2,6 +2,7 @@ import os, sys
 import pygame
 from src.mobs import Mobs
 from src.money import Money
+from src.Mobs.mobSlime import mobSlime
 
 #Classe unicamente criada para separar o spawn dos mobs da classe game e deixar mais dinamico
 
@@ -19,8 +20,12 @@ class Spawn:
             self.listMobs.add(mobs)
 
     def __spawnMobFromID(self, id_, posX):
-        mob = Mobs(self.settings, self.player, self.__camera.getBackground(),posX,id_)
-        self.listMobs.add(mob)
+        if id_ == 0:
+            mob = mobSlime(self.settings, self.player, self.__camera.getBackground(),posX)
+            self.listMobs.add(mob)
+        else:
+            mob = Mobs(self.settings, self.player, self.__camera.getBackground(),posX,id_)
+            self.listMobs.add(mob)
 
     def __destroyMobs(self):
         self.player.removeColision()

@@ -8,7 +8,7 @@
     Arrumado o arquivo dtn.config
     Adicionado a opção ADMIN no dtn.config
     Arrumado settings para permitir caixa alta ou baixa no dtn.config
-    Criado a class Spawn para cuidar do spawn dos mobs, limpando um pouco a class Game
+    Criado a class Spawn para cuidar do spawn dos mobs, limpando um pouco a class Gametrue
 
 --Problemas ocorrentes
     Class câmera e background bagunçados

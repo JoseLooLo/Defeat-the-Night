@@ -1,6 +1,7 @@
 import os, sys
 import pygame
 import time
+import abc
 from random import randint
 
 class Mobs(pygame.sprite.Sprite):
@@ -24,6 +25,8 @@ class Mobs(pygame.sprite.Sprite):
 		self.qntImageMob = self.settings.getMobQntImages(self.mobID)
 		self.numCurrentImageMob = 0
 		self.velocityImageMob = self.settings.getMobVelocityImages(self.mobID)
+
+		self.haveAttack = False
 
 		#Variaveis de status
 		self.mobDamage = self.settings.getMobStatusDamage(self.mobID) + randint(0,self.settings.getMobStatusDamageLimit(self.mobID))
@@ -55,6 +58,7 @@ class Mobs(pygame.sprite.Sprite):
 	def getRectMob(self):
 		tempRect = self.__rectMob.copy()
 		tempRect.x = self.currentMobPosX
+		#tempRect.y = self.settings.valuePosY-self.__rectMob.h #
 		return tempRect
 
 	#Como o mob pode se mover para a direita ou esquerda, segue que a prox imagem pode ser de A para B quando de B para A
@@ -99,11 +103,15 @@ class Mobs(pygame.sprite.Sprite):
 	def __checkColisionPlayer(self):
 		tempMobRect = self.getRectMob().copy()
 		tempMobRect.y = self.player.getRectPlayer().y
+		#tempMobRect.y = self.settings.valuePosY-self.__rectMob.h
 		if self.player.getRectPlayer().colliderect(tempMobRect):
 			return True
 		if tempMobRect.colliderect(self.player.getRectPlayer()):
 			return True
 		return False
+
+	def checkColisionPlayer(self):
+		return self.__checkColisionPlayer()
 
 	def __updateVelocity(self):
 		#Altera a velocidade para seguir o player
@@ -113,3 +121,7 @@ class Mobs(pygame.sprite.Sprite):
 			self.mobVelocity *= -1
 		elif self.player.getPlayerPosX() + self.player.getRectPlayer().w > self.currentMobPosX and self.mobVelocity < 0:
 			self.mobVelocity *= -1
+
+	@abc.abstractmethod
+	def mobAttack(self):
+		pass
