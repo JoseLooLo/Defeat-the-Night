@@ -7,13 +7,12 @@ class Font:
     def __init__(self, fontName = "comicsansms", fromSystem = True, fontSize = 30):
         #Font padrão
         self.__defaultFontName = "comicsansms"
-        self.__defaultFontSize = 30
         #Font atual
         self.fontName = fontName
         self.fontSize = fontSize
         self.fromSystem = fromSystem
 
-        self.font = pygame.font.SysFont(self.__defaultFontName, self.__defaultFontSize)
+        self.font = pygame.font.SysFont(self.__defaultFontName, self.fontSize)
         self.__init()
 
     def __init(self):
@@ -26,7 +25,7 @@ class Font:
         self.__loadFont()
 
     def __resetFont(self):
-        self.font = pygame.font.SysFont(self.__defaultFontName, self.__defaultFontSize)
+        self.font = pygame.font.SysFont(self.__defaultFontName, self.fontSize)
 
     def __loadFont(self):
         #Tenta carregar a fonte, caso não for possivel retorna ao default

@@ -110,3 +110,11 @@ class Time(pygame.sprite.Sprite):
     def draw(self, camera):
         camera.drawScreenFix(self.textClockTime, (self.settings.screen_width/2 -self.textClockTime.get_rect().w/2, 30))
         camera.drawScreenFix(self.textClockDay,(self.settings.screen_width/2 -self.textClockDay.get_rect().w/2, 75))
+
+    def setTimeFromChat(self, setNight):
+        if setNight:
+            self.currentTimeHr = 15
+            self.currentTimeMin = 59
+        else:
+            self.currentTimeHr = 6
+            self.currentTimeMin = 59

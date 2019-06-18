@@ -3,3 +3,17 @@
     Substituido as imagens do NPC 3 (Rodolfo) - 25 imagens
     Adicionado as imagens do Pulo - 10 imagens
     Alterado o módulo do pulo | Incompleto
+    Arrumado o limitador do limite do mapa
+    Criado o chat / Tecla Enter
+    Arrumado o arquivo dtn.config
+    Adicionado a opção ADMIN no dtn.config
+    Arrumado settings para permitir caixa alta ou baixa no dtn.config
+    Criado a class Spawn para cuidar do spawn dos mobs, limpando um pouco a class Game
+
+--Problemas ocorrentes
+    Class câmera e background bagunçados
+    O jogo suporta uma resolução de até 1130px de altura mas não trata caso supere esse número
+    Apesar de no settings suportar mais de uma imagem de background, o código não o faz // falta criar esse sistema para o background
+    Há uma travada no personagem após pular / Somente em fullscreen
+    Jump do player está funcionando mas não da melhor forma possivel / Alterar com o tempo
+    O chat tem uns problemas pois não reconhece teclas que precisam do shift, porém como são desnecessarias irei deixar passar

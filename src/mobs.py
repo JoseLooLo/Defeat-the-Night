@@ -5,11 +5,12 @@ from random import randint
 
 class Mobs(pygame.sprite.Sprite):
 
-	def __init__(self, settings, player, background, mobID):
+	def __init__(self, settings, player, background, spawnPosX, mobID):
 		pygame.sprite.Sprite.__init__(self)
 		self.settings = settings
 		self.player = player
 		self.background = background
+		self.currentMobPosX = spawnPosX
 		self.mobID = mobID
 
 		self.__init()
@@ -33,9 +34,6 @@ class Mobs(pygame.sprite.Sprite):
 		#Time
 		self.startChangeImage = time.time()
 		self.endChangeImage = time.time()
-
-		#Variaveis de controle
-		self.currentMobPosX = 5000
 
 		if self.settings.generalInfo:
 			print ("New Mob ID = %d | posX %d | Dmg %d | Vel %d | HP %d " % (self.mobID, self.currentMobPosX, self.mobDamage, self.mobVelocity, self.mobLife))

@@ -15,7 +15,6 @@ class Background(pygame.sprite.Sprite):
         self.__loadVariables()
         self.__loadImages()
         self.__loadSurface()
-        self.__loadPosBackground()
 
     def __loadSurface(self):
         #Cria o suface do background << IMPORTANTE
@@ -35,27 +34,11 @@ class Background(pygame.sprite.Sprite):
         self.__currentImageBackground = self.__imageBackground[0]
         self.__rectBackground = self.__currentImageBackground.get_rect()
 
-    def __loadPosBackground(self):
-        self.__posXBackground = int((self.__currentImageBackground.get_size()[0] - self.settings.screen_width)/2)
-        self.__posYBackground = 380
-
     def getHeightBackground(self):
         return self.__currentImageBackground.get_rect().h
 
-    def getSizeCurrentImageBackground(self):
-        return self.__currentImageBackground.get_size()
-
-    def getPosXBackground(self):
-        return self.__posXBackground
-
-    def getPosYBackground(self):
-        return self.__posYBackground
-    
-    def setPosXBackground(self, posX):
-        self.__posXBackground = posX
-        
     def getBackgroundSurface(self):
         return self.background
 
     def draw(self):
-        self.background.blit(self.__currentImageBackground, (self.camera.getCameraRect()[0]-30,self.camera.getCameraRect()[1]), (self.camera.getCameraRect()[0]+30,self.camera.getCameraRect()[1],self.settings.screen_width+60,self.settings.screen_height))
+        self.background.blit(self.__currentImageBackground, (self.camera.getCameraRect()[0]-30,self.camera.getCameraRect()[1]), (self.camera.getCameraRect()[0]-30,self.camera.getCameraRect()[1],self.settings.screen_width+60,self.settings.screen_height))

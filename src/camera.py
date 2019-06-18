@@ -20,7 +20,11 @@ class Camera:
         tempY = self.__background.getHeightBackground() - self.settings.screen_height
         if self.settings.screen_height <= 1000:
             tempY -= 100
-        self.__playerPos = (3850,tempY)
+        #Metade do mapa seria
+        #BackgroundImage.w/2 - screen_width/2 - player.rect.w/2
+        #Mas o player é criado depois do background, então desconsidere o player, ficara uns pixels para a direita
+        tempX = int(self.getBackgroundImageW()/2 - self.settings.screen_width/2)
+        self.__playerPos = (tempX, tempY)
 
     def update(self):
         self.setCameraRectPlayer(self.__playerPos)
@@ -40,14 +44,11 @@ class Camera:
     def setCameraRectPlayer(self, playerPos):
         self.__cameraRect = (self.__playerPos[0], self.__playerPos[1], self.settings.screen_width, self.settings.screen_height)
 
-    def setScreen(self, screen):
-        self.__screen = screen
-
-    def setBackground(self, background):
-        self.__background = background
-
     def getBackground(self):
         return self.__background
+
+    def getBackgroundImageW(self):
+        return self.__background.getBackgroundSurface().get_rect().w
 
     def getPosXplayer(self):
         return self.__playerPos[0]
@@ -81,8 +82,4 @@ class Camera:
     def drawScreen(self):
         self.update()
         self.__screen.blit(self.__background.getBackgroundSurface(), (0,0), self.getCameraRect())
-        self.drawBackgroundImage()
-        
-
-    def drawBackgroundImage(self):
         self.__background.draw()

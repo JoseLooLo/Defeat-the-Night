@@ -94,7 +94,6 @@ class Player(pygame.sprite.Sprite):
 		self.__flipImage()
 
 	def __setProxImagePlayerJump(self):
-		print (self.numCurrentImagePlayer)
 		if self.numCurrentImagePlayer == self.qntImagePlayerJump -1:
 			pass
 			#self.numCurrentImagePlayer = 0
@@ -175,6 +174,9 @@ class Player(pygame.sprite.Sprite):
 	def resetCurrentImagePlayer(self):
 		self.numCurrentImagePlayer = 0
 
+	def resetCurrentImagePlayerAfterJump(self):
+		self.numCurrentImagePlayer = 1
+
 	def getPlayerPosX(self):
 		return self.camera.getPosXplayer() + self.settings.screen_width/2
 
@@ -208,24 +210,19 @@ class Player(pygame.sprite.Sprite):
 				self.camera.addPlayerPosX(self.playerVelocity)
 
 	def __verificaExtremos(self):
-		if self.camera.getBackground().getPosXBackground() + self.playerVelocity < 0:
+		if self.camera.getPosXplayer() + self.playerVelocity < self.settings.screen_width/2:
 			return True
-		if self.camera.getBackground().getPosXBackground() + self.playerVelocity > (self.camera.getBackground().getSizeCurrentImageBackground()[0] - self.settings.screen_width):
+		#if self.camera.getPosXplayer() + self.playerVelocity > (self.camera.getBackgroundImageW() - self.settings.screen_width - 200):
+		# if self.camera.getPosXplayer() + self.playerVelocity > self.camera.getBackgroundImageW() - self.settings.screen_width - self.__rectPlayer.w-30:
+		if self.camera.getPosXplayer() + self.playerVelocity > self.camera.getBackgroundImageW() - self.settings.screen_width - self.__rectPlayer.w/2:
 			return True
 		return False
 
 	def __updateJump(self):
 		if self.inJump:
-			self.__jump2()
-
-	def __jump(self):
-		if self.numCurrentImagePlayer <= self.qntImagePlayerJump/2:
-			self.__rectPlayer.y += self.playerStatusDefaultJumpTime
-		elif self.numCurrentImagePlayer > self.qntImagePlayerJump/2:
-			self.__rectPlayer.y -= self.playerStatusDefaultJumpTime
-
+			self.__jump()
 	
-	def __jump2(self):
+	def __jump(self):
 		if self.countInJumpUp - self.playerStatusDefaultJumpTime > 0:
 			self.countInJumpUp -= self.playerStatusDefaultJumpTime
 			self.countInJumpDown += self.playerStatusDefaultJumpTime
@@ -370,3 +367,19 @@ class Player(pygame.sprite.Sprite):
 			return
 		self.inAtack = True
 		self.numCurrentImagePlayer = 0
+
+	def getMoneyFromChat(self, value):
+		self.playerMoney += value
+		print ("Get money %d (from chat)" % (value))
+
+	def getWeaponDamageFromChat(self, value):
+		self.playerDamage += value
+		print ("Get weapon damage %d (from chat)" % (value))
+
+	def getHPFromChat(self, value):
+		self.playerLife += value
+		print ("Get HP %d (from chat)" % (value))
+
+	def getVelocityFromChat(self, value):
+		self.playerVelocity += value
+		print ("Get Velocity %d (from chat)" % (value))

@@ -12,12 +12,20 @@ class Settings:
 		self.fullScreen = False
 		self.gameName = "Defeat the Night"
 
+		#Configuração de teste
+		self.admin = False
+
 		#Configuração de Som
 		self.soundEnable = True
 		self.soundVolume = 1
 
 		#Icon
 		self.gameIconName = "icon.png"
+
+		#Fonts
+		self.fontChatName = "comicsansms"
+		self.fontGeneralName = "comicsansms"
+		self.fontTimeName = "comicsansms"
 
 		#Configurações gerais 354
 		self.valuePosY = 835             #Valor usado para diminuir a distacia da posY e colocar os objetos na linha do chão
@@ -48,19 +56,30 @@ class Settings:
 			if configName == "ResolutionH":
 				self.screen_height = int(configValue)
 			if configName == "FullScreen":
-				if configValue == "FALSE":
+				if configValue.lower() == "false":
 					self.fullScreen = False
-				elif configValue == "TRUE":
+				elif configValue.lower() == "true":
 					self.screen_width = pygame.display.Info().current_w
 					self.screen_height = pygame.display.Info().current_h
 					self.fullScreen = True
 			if configName == "EnableSound":
-				if configValue == "FALSE":
+				if configValue.lower() == "false":
 					self.soundEnable = False
-				elif configValue == "TRUE":
+				elif configValue.lower() == "true":
 					self.soundEnable = True
 			if configName == "SoundVolume":
 				self.soundVolume = int(configValue)
+			if configName == "Admin":
+				if configValue.lower() == "false":
+					self.admin = False
+				elif configValue.lower() == "true":
+					self.admin = True
+			if configName == "FontGeneralName":
+				self.fontGeneralName = configValue
+			if configName == "FontChatName":
+				self.fontChatName = configValue
+			if configName == "FontTimeName":
+				self.fontTimeName = configValue
 		except:
 			self.__resetConfig()
 			self.__createNewConfig()
@@ -71,6 +90,10 @@ class Settings:
 		self.fullScreen = False
 		self.soundEnable = True
 		self.soundVolume = 1
+		self.admin = False
+		self.fontChatName = "comicsansms"
+		self.fontGeneralName = "comicsansms"
+		self.fontTimeName = "comicsansms"
 
 	def __createNewConfig(self):
 		arquivoConfig = open('dtn.conf', 'w')
@@ -80,6 +103,10 @@ class Settings:
 		texto.append('FullScreen = TRUE\n')
 		texto.append('EnableSound = TRUE\n')
 		texto.append('SoundVolume = ',self.soundVolume,'\n')
+		texto.append('Admin = TRUE\n')
+		texto.append('FontGeneralName = x\n')
+		texto.append('FontChatName = x\n')
+		texto.append('FontTimeName = x\n')
 		arquivoConfig.writelines(texto)
 		arquivoConfig.close()
 
@@ -99,10 +126,13 @@ class Settings:
 		#CHARRED ZARD.ttf
 
 		#Fonte geral
-		self.fontGeneral = Font("lunchds.ttf", False, 25)
+		self.fontGeneral = Font(self.fontGeneralName, False, 25)
+
+		#Fonte chat
+		self.fontChat = Font(self.fontChatName, False, 25)
 
 		#Fonte relógio
-		self.fontTime = Font("CHARRED ZARD.ttf", False, 60)
+		self.fontTime = Font(self.fontTimeName, False, 60)
 
 	def __loadVariables(self):
 		self.__loadColorVariables()
@@ -114,6 +144,7 @@ class Settings:
 		self.__loadMoneyVariables()
 		self.__loadBackgroundVariables()
 		self.__loadSoundVariables()
+		self.__loadObjectsVariables()
 
 	def __loadColorVariables(self):
 		#Tabela de cores utilizadas e/ou uteis
@@ -134,6 +165,8 @@ class Settings:
 		self.HUDDamageColor = self.color_black
 		self.HUDSpeedColor = self.color_black
 		self.HUDCoinColor = self.color_green
+
+		self.chatTextColor = self.color_red
 
 	def __loadBackgroundVariables(self):
 		#A ordem de incersão é importante
@@ -276,6 +309,9 @@ class Settings:
 		self.mobStatusVelocityLimit.append(1)
 		self.mobStatusLifeLimit.append(30)
 
+	def getMobNameVector(self):
+		return self.mobName
+
 	def getMobMoneyDrop(self, mobID):
 		return self.mobMoneyDrop[mobID]
 
@@ -401,6 +437,31 @@ class Settings:
 
 	def getSoundNPCNoMoney(self, npcID):
 		return self.soundNPCNoMoneyName[npcID]
+
+	def __loadObjectsVariables(self):
+		self.objectName = []
+		self.objectQntImages = []
+		self.objectVelocityImages = []
+		self.objectHaveColision = []
+
+		#A busca das imagens é baseado no nome do objeto seguido do numero da imagem Ex: PedrasF0, PedrasF1..
+		#Adiciona os objetos / Ordem importa
+		self.objectName.append("stoneF")
+		self.objectQntImages.append(1)
+		self.objectVelocityImages.append(1)
+		self.objectHaveColision.append(True)
+
+	def getObjectName(self, objectID):
+		return self.objectName[objectID]
+
+	def getObjectQntImages(self, objectID):
+		return self.objectQntImages[objectID]
+	
+	def getObjectVelocityImages(self, objectID):
+		return self.objectVelocityImages[objectID]
+
+	def getObjectHaveColision(self, objectID):
+		return self.objectHaveColision[objectID]
 
 	def resetVariables(self):
 		self.__loadVariables()
