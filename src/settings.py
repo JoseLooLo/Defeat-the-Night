@@ -113,7 +113,8 @@ class Settings:
 	def __loadSound(self):
 		try:
 			pygame.mixer.init(44100, -16,2,2048)
-			self.sounda = pygame.mixer.Sound("data/Sounds/fala1.ogg")
+			self.sound = pygame.mixer.Sound("data/Sounds/Hurry Starfish.ogg")
+			self.sound.play(-1)
 		except:
 			print ("Erro ao iniciar o módulo de Som e/ou carregar alguns sons")
 			self.soundEnable = False

@@ -195,7 +195,8 @@ class Npc(pygame.sprite.Sprite):
                 print("Buy %s | Price %d" % (self.itemName[self.itemIDToday], self.itemPrice[self.itemIDToday]))
         else:
             if self.settings.soundEnable:
-                self.settings.sounda.play()
+                pass
+                #self.settings.sounda.play()
         self.__checkBuyAll()
 
     def sellNPCPotions(self, player):

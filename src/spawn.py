@@ -74,20 +74,20 @@ class Spawn:
             pos = self.posSpawnEsq
 
         if tempID == 0:
-            self.spawnSlime()
+            self.spawnSlime(pos)
         else:
-            mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),self.posSpawnDir,tempID)
+            mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),pos,tempID)
             self.listMobs.add(mobs)
         
         self.numMobsSpawn -=1
 
-    def spawnSlime(self):
+    def spawnSlime(self, pos):
         temp = randint(0,1)
         if temp == 0:
-            mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),self.posSpawnDir,0)
+            mobs = Mobs(self.settings, self.player, self.__camera.getBackground(),pos,0)
             self.listMobs.add(mobs)
         else:
-            mobs = mobSlime(self.settings, self.player, self.__camera.getBackground(),self.posSpawnDir)
+            mobs = mobSlime(self.settings, self.player, self.__camera.getBackground(),pos)
             self.listMobs.add(mobs)
 
     def __createMoney(self, moneyID, posXDrop, value = 0):
