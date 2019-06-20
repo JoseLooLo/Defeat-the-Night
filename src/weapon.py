@@ -3,94 +3,53 @@ import pygame
 from random import randint
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, image, settings, player, weaponID):
+    def __init__(self, settings, player, weaponID):
         pygame.sprite.Sprite.__init__(self)
-        self.image = image
         self.settings = settings
         self.player = player
-        self.rect = image.get_rect()
         self.weaponID = weaponID
 
         self.__init()
 
     def __init(self):
-        self.__loadClass()
         self.__loadVariables()
-        self.__setImagensPositions()
-        self.__createImages()
-
-    def __loadClass(self):
-        self.__weaponPosX = [0]*3
-        self.__weaponPosY = [0]*3
-        self.__weaponDamage = 0
-        self.__velocityImageChange = 5
-        self.__weaponDelay = 20
-        self.__weaponImageDelay = 40
-        self.__weaponKnockBack = 40
-        
-        self.__inCombate = False
+        self.__loadImages()
 
     def __loadVariables(self):
-        self.weaponDamage = self.__weaponDamage
-        self.inCombate = self.__inCombate
-        self.velocityImageChange = self.__velocityImageChange
-        self.weaponDelay = self.__weaponDelay
-        self.weaponImageDelay = self.__weaponImageDelay
-        self.weaponKnockBack = self.__weaponKnockBack
+        self.qntImagesWeapon = self.settings.getWeaponQntImages(self.weaponID)
+        self.numCurrentImage = 0
+        self.flipDis = -7
 
-    def changeWeapon(self):
-        if self.weaponID == 12:
-            self.weaponID = 1
-        self.weaponID+=1
-        self.__setImagensPositions()
-        self.__createImages()
+    def __loadImages(self):
+        self.__imagesWeapon = []
+        for i in range(self.qntImagesWeapon):
+            tempImage = self.settings.load_Images(str(i)+".png", "Weapon/ID"+str(self.weaponID), -1)
+            self.__imagesWeapon.append(tempImage)
 
-    def __setImagensPositions(self):
-        linha = 0
-        coluna = 0
-        if self.weaponID > 6:
-            linha = self.weaponID-7
-            coluna = 2
-        else:
-            linha = self.weaponID-1
-            coluna = 1
-        if coluna == 1:
-            self.__weaponPosX[0] = 42
-            self.__weaponPosX[1] = 95
-            self.__weaponPosX[2] = 192
-        else:
-            self.__weaponPosX[0] = 332
-            self.__weaponPosX[1] = 386
-            self.__weaponPosX[2] = 482
+        self.__currentImage = self.__imagesWeapon[0]
+        self.__rect = self.__currentImage.get_rect()
 
-        self.__weaponPosY[0] = 64*linha
-        self.__weaponPosY[1] = 64*linha
-        self.__weaponPosY[2] = 64*linha
+    def setCurrentImage(self, num):
+        self.__currentImage = self.__imagesWeapon[num]
+        self.numCurrentImage = num
 
-    def changeWeaponImageAtual(self, weapon):
-        if weapon == 1:
-            self.weaponAtual = self.weaponImage1
-        elif weapon == 2:
-            self.weaponAtual = self.weaponImage2
-        elif weapon == 3:
-            self.weaponAtual = self.weaponImage3
-        elif weapon == 4:
-            self.weaponAtual = self.weaponImage4
-        elif weapon == 5:
-            self.weaponAtual = self.weaponImage5
-        elif weapon == 6:
-            self.weaponAtual = self.weaponImage6
+    def getCurrentImage(self):
+        return self.__currentImage
 
-        self.rect = self.weaponAtual.get_rect()
-        self.contadorImageAtual = weapon
+    def resetFlipDis(self):
+        self.flipDis = -7
 
-    def __createImages(self):
-        self.weaponImage1 = self.image.subsurface((self.__weaponPosX[0],self.__weaponPosY[0],53,63))
-        self.weaponImage2 = self.image.subsurface((self.__weaponPosX[1],self.__weaponPosY[1],53,63))
-        self.weaponImage3 = self.image.subsurface((self.__weaponPosX[2],self.__weaponPosY[2],53,63))
-        self.weaponImage4 = pygame.transform.flip(self.weaponImage1, True, False)
-        self.weaponImage5 = pygame.transform.flip(self.weaponImage2, True, False)
-        self.weaponImage6 = pygame.transform.flip(self.weaponImage3, True, False)
-        self.weaponAtual = self.weaponImage3
-        self.rect = self.weaponAtual.get_rect()
-        self.contadorImageAtual = 3
+    def flipImage(self):
+        tempColorKey = self.__currentImage.get_colorkey()
+        tempImage = pygame.transform.flip(self.__currentImage, True, False)
+        tempImage.set_colorkey(tempColorKey)
+        self.__currentImage = tempImage
+        self.flipDis = -self.player.getRectPlayer().w + 15
+
+    def getRectWeapon(self):
+        tempRect = self.__rect.copy()
+        tempRect.x = self.player.getPlayerPosX() + self.flipDis
+        return tempRect
+
+    def inAttack(self):
+        return self.numCurrentImage >= 6 and self.numCurrentImage <= 9

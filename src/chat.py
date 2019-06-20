@@ -91,6 +91,8 @@ class Chat(pygame.sprite.Sprite):
                 if len(vector) > i+2:
                     if vector[i+1] == "time":
                         self.setTime(vector[i+2])
+                    if vector[i+1] == "hp":
+                        self.setHP(vector[i+2])
 
     def destroyMobs(self):
         if not self.settings.admin:
@@ -104,6 +106,15 @@ class Chat(pygame.sprite.Sprite):
         try:
             tempValue = int(value)
             self.player.getMoneyFromChat(tempValue)
+        except:
+            pass
+
+    def setHP(self, value):
+        if not self.settings.admin:
+            return
+        try:
+            tempValue = int(value)
+            self.player.setHPFromChat(tempValue)
         except:
             pass
 
@@ -151,6 +162,7 @@ class Chat(pygame.sprite.Sprite):
         print ("[HELP (admin)] > get hp [value]")
         print ("[HELP (admin)] > get velocity [value]")
         print ("[HELP (admin)] > set time [night or day]")
+        print ("[HELP (admin)] > set hp [value]")
 
     def spawnMob(self, name, id_):
         if not self.settings.admin:

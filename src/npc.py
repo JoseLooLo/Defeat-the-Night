@@ -86,16 +86,10 @@ class Npc(pygame.sprite.Sprite):
         if self.marketQntItensDay == self.marketQntItensBuyDay:
             self.outOfStock = True
 
-    def checkColisionPlayer(self, player):
+    def getRectNPC(self):
         tempRect = self.__rectNPC.copy()
         tempRect.x = self.settings.getNPCPosX(self.npcID)
-        tempRect.y = player.getRectPlayer().y  #Ignora a posY
-        if tempRect.colliderect(player.getRectPlayer()):
-            self.colisionPlayer = True
-        elif player.getRectPlayer().colliderect(tempRect):
-            self.colisionPlayer = True
-        else:
-            self.colisionPlayer = False
+        return tempRect
 
     def update(self):
         self.__updateNPCImage()

@@ -36,6 +36,9 @@ class Money(pygame.sprite.Sprite):
         self.__currentImageMoney = self.__imageMoney[0]
         self.__rectMoney = self.__currentImageMoney.get_rect()
 
+    def getMoneyRect(self):
+        return self.__rectMoney
+
     def __setImageMoney(self, numImg):
         self.__currentImageMoney = self.__imageMoney[numImg]
         self.numCurrentImageMoney = numImg
@@ -55,19 +58,6 @@ class Money(pygame.sprite.Sprite):
         if self.endChangeImage - self.startChangeImage >= self.velocityImageMoney:
             self.startChangeImage = time.time()
             self.__setProxImageMoney()
-
-    def checkColisionPlayer(self, player):
-        tempRect = self.__rectMoney.copy()
-        tempRect.x = self.posXDrop
-        tempRect.y = player.getRectPlayer().y
-
-        if tempRect.colliderect(player.getRectPlayer()):
-            return True
-        elif player.getRectPlayer().colliderect(tempRect):
-            return True
-        else:
-            return False
-
 
     def draw(self, camera):
         #Ao dar zoom se perde a colorkey

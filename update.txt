@@ -9,6 +9,10 @@
     Adicionado a opção ADMIN no dtn.config
     Arrumado settings para permitir caixa alta ou baixa no dtn.config
     Criado a class Spawn para cuidar do spawn dos mobs, limpando um pouco a class Gametrue
+    Criado o mob Slime com ataques próprios
+    Arrumado o ataques
+    Arrumado a class Weapon
+    Criado colisão com a espada
 
 --Problemas ocorrentes
     Class câmera e background bagunçados

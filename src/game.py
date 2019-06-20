@@ -12,6 +12,8 @@ from src.objects import Object
 from src.chat import Chat
 from src.spawn import Spawn
 from src.colision import Colision
+from src.endScreen import endScreen
+from src.mainScreen import mainScreen
 from random import randint
 
 class Game:
@@ -24,20 +26,16 @@ class Game:
 		self.__init()
 
 	def __init(self):
-		self.__temp()
 		self.__loadVariables()
 		self.__createLists()
 		self.__createCamera()
 		self.__createObjects()
 		self.__gameLoop()
 
-	def __temp(self):
-		#Carrega as imagens utilizadas no jogo
-		self.settings.loadDefaultImages()
-
 	def __loadVariables(self):
 		self.showInformationsPlayer = True    #HUD Player
 		self.showInformationsGame = True      #HUD Game
+		self.initGame = False                  #Verifica se está na tela inicial
 		self.gameOver = False                 #GameOver?
 
 	def __createLists(self):
@@ -58,6 +56,10 @@ class Game:
 	def __gameLoop(self):
 		#Loop do jogo
 		while 1:
+			#Verifica tela inicial e gameOver
+			self.__mainScreen()
+			self.__endScreen()
+			#Jogo
 			self.__draw()                    #Desenha os objetos na tela
 			self.__checkEvents()             #Verifica se houve algum evento
 			self.__update()                  #Atualiza os objetos na tela
@@ -65,15 +67,28 @@ class Game:
 			self.clockFPS.tick(60)           #FPS counter
 		pygame.display.flip()
 
+	def __mainScreen(self):
+		if self.initGame:
+			endGame = mainScreen(self, self.settings, self.__camera, self.clockFPS)
+
+	def __endScreen(self):
+		self.__checkGameOver()
+		if self.gameOver:
+			endGame = endScreen(self, self.settings, self.__camera, self.clockFPS)
+			self.__init()
+
+	def __checkGameOver(self):
+		if self.player.playerLife == 0:
+			self.gameOver = True
+
 	def __checkColision(self):
 		self.__checkColisionPlayerNPC()    #Checa a colisão entre player e NPC
-		self.__checkColisionWeaponMob()    #Checa a colisão entre a arma e o MOB
 		self.__checkColisionPlayerMob()    #Checa a colisão entre Player e mob
 		self.__checkColisionPlayerMoney()  #Checa a colisão entre Player e Money
 
 	def __checkColisionPlayerMoney(self):
 		for money in self.spawn.getMoneyList().sprites():
-			if money.checkColisionPlayer(self.player):
+			if Colision.colisionPlayerMoney(self.player, money):
 				self.player.playerMoney += money.value
 				if self.settings.generalInfo:
 					print ("Get money %d" % (money.value))
@@ -82,22 +97,15 @@ class Game:
 
 	def __checkColisionPlayerNPC(self):
 		for npc in self.listNPC.sprites():
-			npc.checkColisionPlayer(self.player)
-
-	def __checkColisionWeaponMob(self):
-		return
-		# if not self.player.ifHit:
-		# 	for mob in self.listMobs.sprites():
-		# 		self.player.colisionWeapon(mob)
-		# 		if mob.mobLife <= 0:
-		# 			self.__createMoney(0,self.settings.posX+mob.getRectMob().x+mob.getRectMob().w/2,1)
-		# 			self.listMobs.remove(mob) 
-		# 			self.player.removeColision()
-		# 			del mob
+			Colision.colisionPlayerNPC(self.player, npc)
 	
 	def __checkColisionPlayerMob(self):
+		#Primeiro verifica se está em ataque e tenta ver a colisão com a espada
+		if self.player.inAtack:
+			for mob in self.spawn.getMobList().sprites():
+				Colision.colisionWeaponMob(self.player.getWeapon(), mob)
 		for mob in self.spawn.getMobList().sprites():
-			self.player.colisionMob(mob)
+			Colision.colisionPlayerMob(self.player, mob)  #Verifica se encostou no Mob generico
 			
 	def __checkEvents(self):
 		if self.chat.getVisible():

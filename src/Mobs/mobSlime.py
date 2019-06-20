@@ -2,6 +2,7 @@ import os, sys
 import time
 from random import randint
 from src.mobs import Mobs
+from src.colision import Colision
 
 class mobSlime(Mobs):
     def __init__(self, settings, player, background, spawnPosX):
@@ -19,6 +20,9 @@ class mobSlime(Mobs):
         self.velocityMobAttack = 0.1 #miliseg
         self.inAttack = False
         self.posPlayer = self.player.getPlayerPosX()
+
+        #dano do ataque
+        self.slimeAttack0Damage = self.mobDamage*3
 
         #Delay Attack
         self.delayAttack = randint(1,10)
@@ -50,6 +54,11 @@ class mobSlime(Mobs):
         self.__rectMobAttack0 = self.__currentImageMobAttack0.get_rect()
         self.__rectMobAttack1 = self.__currentImageMobAttack0.get_rect()
 
+    def getRectMobAttack1(self):
+        tempRect = self.__rectMobAttack1.copy()
+        tempRect.x = self.posPlayer
+        return tempRect
+
     def __setProxImageMobAttack(self):
         if self.numCurrentImageMob == self.qntImageAttack-1:
             self.numCurrentImageMob = 0
@@ -68,10 +77,16 @@ class mobSlime(Mobs):
     def update(self):
         self.__updateDelayAttack()
         self.__checkAttack()
+        self.__checkDamagePlayer()
         if not self.inAttack:
             super().update()
         else:
             self.__updateImageMobAttack()
+
+    def __checkDamagePlayer(self):
+        #Numeros baseados no numero da imagem que o tentaculo sai do chão
+        if self.inAttack and self.numCurrentImageMob >= 8 and self.numCurrentImageMob <= 14:
+            Colision.colisionSlimeAttackPlayer(self.player, self)
 
     def __updateDelayAttack(self):
         if self.inAttack:
@@ -85,7 +100,7 @@ class mobSlime(Mobs):
         if self.inAttack or self.inDelayAttack:
             return
         disRan = randint(0,100)
-        if self.__checkColisionPlayerAttack(disRan):
+        if Colision.colisionSlimePlayer(self.player, self, disRan):
             if not self.inAttack:
                 self.posPlayer = self.player.getPlayerPosX()
                 #print ("Mob attack distancia = %d" % (disRan))
@@ -93,19 +108,9 @@ class mobSlime(Mobs):
                 self.numCurrentImageMob = 0
                 return
 
-    def __checkColisionPlayerAttack(self, dif):
-        tempMobRect = self.getRectMob().copy()
-        if self.mobVelocity > 0:
-            tempMobRect.x += dif
-        else:
-            tempMobRect.x -= dif
-        tempMobRect.y = self.player.getRectPlayer().y
-        #tempMobRect.y = self.settings.valuePosY-self.__rectMob.h
-        if self.player.getRectPlayer().colliderect(tempMobRect):
-            return True
-        if tempMobRect.colliderect(self.player.getRectPlayer()):
-            return True
-        return False
+    def setDamage(self):
+        pass
+        #print("ol")
 
     def draw(self, camera):
         if not self.inAttack:

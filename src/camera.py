@@ -83,3 +83,7 @@ class Camera:
         self.update()
         self.__screen.blit(self.__background.getBackgroundSurface(), (0,0), self.getCameraRect())
         self.__background.draw()
+
+    def drawScreenMain(self):
+        self.update()
+        self.__screen.fill(self.settings.mainBackgroundColor)

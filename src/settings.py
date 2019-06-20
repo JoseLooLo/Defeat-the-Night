@@ -145,6 +145,7 @@ class Settings:
 		self.__loadBackgroundVariables()
 		self.__loadSoundVariables()
 		self.__loadObjectsVariables()
+		self.__loadWeaponVariables()
 
 	def __loadColorVariables(self):
 		#Tabela de cores utilizadas e/ou uteis
@@ -167,6 +168,9 @@ class Settings:
 		self.HUDCoinColor = self.color_green
 
 		self.chatTextColor = self.color_red
+		self.mainBackgroundColor = self.color_black
+		self.mainTextColor = self.color_white
+		self.gameOverTextColor = self.color_red
 
 	def __loadBackgroundVariables(self):
 		#A ordem de incersão é importante
@@ -187,6 +191,7 @@ class Settings:
 		self.playerQntImagesAttack = []
 		self.playerQntImagesJump = []
 		self.playerVelocityImages = []
+		self.playerVelocityImagesAttack = []
 		self.playerStatusDamage = []
 		self.playerStatusVelocity = []
 		self.playerStatusLife = []
@@ -212,6 +217,7 @@ class Settings:
 
 		#Velocidade de troca de imagens do movimento do player
 		self.playerVelocityImages.append(0.150)
+		self.playerVelocityImagesAttack.append(0.04)
 
 		#Status do player
 		self.playerStatusDamage.append(5)
@@ -239,6 +245,9 @@ class Settings:
 	
 	def getPlayerVelocityImages(self, playerID):
 		return self.playerVelocityImages[playerID]
+
+	def getPlayerVelocityImagesAttack(self, playerID):
+		return self.playerVelocityImagesAttack[playerID]
 	
 	def getPlayerStatusDamage(self, playerID):
 		return self.playerStatusDamage[playerID]
@@ -463,12 +472,19 @@ class Settings:
 	def getObjectHaveColision(self, objectID):
 		return self.objectHaveColision[objectID]
 
+	def __loadWeaponVariables(self):
+		#A arma deve ter a mesma quantidade de frames do player atacando!!
+		self.weaponName = []
+		self.weaponQntImages = []
+
+		self.weaponName.append("Weapon 1")
+		self.weaponQntImages.append(11)
+
+	def getWeaponQntImages(self, weaponID):
+		return self.weaponQntImages[weaponID]
+
 	def resetVariables(self):
 		self.__loadVariables()
-
-	def loadDefaultImages(self):
-		#Imagem das armas
-		self.weapon = self.load_Images("weapon.png",None,-1)
 
 	#NameImage = Nome da imagem com extensão
 	#NameDirectory = Nome da pasta que se encontra dentro da pasta /data/Images/

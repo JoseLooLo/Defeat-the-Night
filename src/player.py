@@ -1,6 +1,7 @@
 import os, sys
 import pygame
 import time
+from src.colision import Colision
 from src.weapon import Weapon
 
 class Player(pygame.sprite.Sprite):
@@ -10,14 +11,13 @@ class Player(pygame.sprite.Sprite):
 		self.settings = settings
 		self.playerID = playerID
 		self.camera = camera
-		self.weaponAtual = pygame.sprite.Group()
+		self.weaponAtual = Weapon(self.settings, self, 0)
 
 		self.__init()
 
 	def __init(self):
 		self.__loadVariables()
 		self.__loadImages()
-		self.__createWeapon()
 
 	def __loadVariables(self):
 		#Variaveis de controle dos Frames
@@ -27,6 +27,7 @@ class Player(pygame.sprite.Sprite):
 		self.qntImagePlayerJump = self.settings.getPlayerQntImagesJump(self.playerID)
 		self.numCurrentImagePlayer = 0
 		self.velocityImagePlayer = self.settings.getPlayerVelocityImages(self.playerID)
+		self.velocityImagePlayerAttack = self.settings.getPlayerVelocityImagesAttack(self.playerID)
 
 		#Variaveis de Status
 		self.playerDamage = self.settings.getPlayerStatusDamage(self.playerID)
@@ -139,6 +140,8 @@ class Player(pygame.sprite.Sprite):
 	def __setImagePlayerAttack(self, numImg):
 		self.__currentImagePlayer = self.__imagePlayerAttack[numImg]
 		self.numCurrentImagePlayer = numImg
+		self.weaponAtual.setCurrentImage(self.numCurrentImagePlayer)
+		self.weaponAtual.resetFlipDis()
 		self.__flipImage()
 
 	def __setProxImagePlayerAttack(self):
@@ -161,13 +164,14 @@ class Player(pygame.sprite.Sprite):
 			self.__setProxImagePlayerMoving()
 
 	def setInMoving(self, inMoving):
-		if not self.inAtack:
-			self.inMoving = inMoving
+		self.inMoving = inMoving
+		if not inMoving and not self.inAtack:
 			self.resetCurrentImagePlayer()
-		elif not inMoving:
-			self.inMoving = inMoving
+		self.inMoving = inMoving
 
 	def setInJump(self, inJump):
+		if self.inAtack:
+			return
 		self.inJump = inJump
 		self.resetCurrentImagePlayer()
 
@@ -192,8 +196,11 @@ class Player(pygame.sprite.Sprite):
 			self.countImunityTime+=1
 
 	def __updateImages(self):
+		tempVelocity = self.velocityImagePlayer
+		if self.inAtack:
+			tempVelocity = self.velocityImagePlayerAttack
 		self.endChangeImage = time.time()
-		if self.endChangeImage - self.startChangeImage >= self.velocityImagePlayer:
+		if self.endChangeImage - self.startChangeImage >= tempVelocity:
 			self.startChangeImage = time.time()
 			self.__setProxImagePlayer()
 
@@ -212,8 +219,6 @@ class Player(pygame.sprite.Sprite):
 	def __verificaExtremos(self):
 		if self.camera.getPosXplayer() + self.playerVelocity < self.settings.screen_width/2:
 			return True
-		#if self.camera.getPosXplayer() + self.playerVelocity > (self.camera.getBackgroundImageW() - self.settings.screen_width - 200):
-		# if self.camera.getPosXplayer() + self.playerVelocity > self.camera.getBackgroundImageW() - self.settings.screen_width - self.__rectPlayer.w-30:
 		if self.camera.getPosXplayer() + self.playerVelocity > self.camera.getBackgroundImageW() - self.settings.screen_width - self.__rectPlayer.w/2:
 			return True
 		return False
@@ -255,97 +260,29 @@ class Player(pygame.sprite.Sprite):
 			tempY = self.__rectPlayer.y
 			self.__rectPlayer = self.__currentImagePlayer.get_rect()
 			self.__rectPlayer.y = tempY
+			self.weaponAtual.flipImage()
 
 	def resetVariables(self):
 		self.__loadVariables()
 
-	def __createWeapon(self):
-		self.weapon = Weapon(self.settings.weapon, self.settings, self, 1)
-		self.weaponAtual.add(self.weapon)
-
 	def draw(self, camera):
 		camera.drawScreenFix(self.__currentImagePlayer, (self.settings.screen_width/2, self.settings.valuePosY-self.__rectPlayer.h-self.__rectPlayer.y))
+		if self.inAtack:
+			camera.drawScreenFix(self.weaponAtual.getCurrentImage(), (self.settings.screen_width/2+self.weaponAtual.flipDis, self.settings.valuePosY-self.__rectPlayer.h-self.__rectPlayer.y-8))
 
 	def getRectPlayer(self):
 		tempRect = self.__rectPlayer.copy()
 		tempRect.x = self.getPlayerPosX()
 		return tempRect
 
-	def colisionMob(self, mob):
-		if self.inJump:                   #Se está pulando não faz a checagem de colisão
-			self.removeColision()    	  #Remove as colisoes
-			return
-		self.__checkColisionMob(mob)
-		
-	def colisionWeapon(self,mob):
-		self.__checkColisionAtack(mob)
+	def getWeapon(self):
+		return self.weaponAtual
 
 	def removeColision(self):
 		self.colisionLeft = False
 		self.colisionRight = False
 
-	def __checkColisionAtack(self, mob):
-		self.tempMobRect = mob.getRectMob().copy()
-		self.tempWeaponRect = self.weapon.rect.copy()
-		if not self.posMouseRight:
-			self.tempMobRect.x += self.weapon.rect.w
-			self.tempWeaponRect.x = self.rect.x+30
-			self.tempWeaponRect.y = self.rect.y+25
-			if self.tempWeaponRect.colliderect(self.tempMobRect) and mob.mobVelocity > 0:             #Verifica a colisão entre o player e o rect
-				print("Vida atual do mob "+ str(mob.mobLife))
-				print (self.tempWeaponRect)
-				print (self.tempMobRect)
-				self.ifHit = True
-				mob.currentMobPosX -= self.weapon.weaponKnockBack
-				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
-		else:
-			self.tempMobRect.x -= self.weapon.rect.w+30
-			self.tempWeaponRect.x = self.rect.x+self.rect.w/2-50
-			self.tempWeaponRect.y = self.rect.y+25
-			if self.tempMobRect.colliderect(self.tempWeaponRect) and mob.mobVelocity < 0:                #Verifica a colisão entre o mod e o player
-				print("Vida atual do mob "+ str(mob.mobLife))
-				print (self.tempWeaponRect)
-				print (self.tempMobRect)
-				self.ifHit = True
-				mob.currentMobPosX += self.weapon.weaponKnockBack
-				mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
-
-	def __checkColisionMob(self, mob):
-		#Ignora a posY
-		tempMobRect = mob.getRectMob().copy()
-		tempMobRect.y = self.getRectPlayer().y
-		if mob.mobVelocity > 0:
-			if self.getRectPlayer().colliderect(tempMobRect):                #Verifica a colisão entre o player e o rect
-				self.__setDamage(mob.mobDamage)
-				self.colisionLeft = True
-			else:
-				self.colisionLeft = False
-		elif mob.mobVelocity < 0:
-			if tempMobRect.colliderect(self.getRectPlayer()):                #Verifica a colisão entre o mod e o player
-				self.__setDamage(mob.mobDamage)
-				self.colisionRight = True
-			else:
-				self.colisionRight = False
-
-	def __updateCurrentWeaponImage(self):
-		if self.inAtack:
-			if self.posMouseRight and self.weapon.contadorImageAtual < 4:
-				self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual+3)
-			elif not self.posMouseRight and self.weapon.contadorImageAtual > 3:
-				self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual-3)
-			if self.contadorWeaponDelay == self.weapon.weaponImageDelay:
-				self.contadorWeaponDelay = 0
-				if self.weapon.contadorImageAtual == 5 or self.weapon.contadorImageAtual == 2:
-					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual+1)
-		else:
-			if self.posMouseRight:
-				if self.weapon.contadorImageAtual < 4:
-					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual+3)
-			else:
-				if self.weapon.contadorImageAtual > 3:
-					self.weapon.changeWeaponImageAtual(self.weapon.contadorImageAtual-3)
-
-	def __setDamage(self, damage):
+	def setDamage(self, damage):
 		if self.inDamage:                       #Se já levou dano e está no tempo de invunerabilidade
 			#A variabel contador de imunidade é incrementada no update de contadores
 			if self.countImunityTime >= self.playerImunityTime:
@@ -379,6 +316,10 @@ class Player(pygame.sprite.Sprite):
 	def getHPFromChat(self, value):
 		self.playerLife += value
 		print ("Get HP %d (from chat)" % (value))
+
+	def setHPFromChat(self, value):
+		self.playerLife = value
+		print ("Set HP %d (from chat)" % (value))
 
 	def getVelocityFromChat(self, value):
 		self.playerVelocity += value

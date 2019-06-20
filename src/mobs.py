@@ -2,6 +2,7 @@ import os, sys
 import pygame
 import time
 import abc
+from src.colision import Colision
 from random import randint
 
 class Mobs(pygame.sprite.Sprite):
@@ -96,32 +97,18 @@ class Mobs(pygame.sprite.Sprite):
 			self.__step()
 
 	def __step(self):
-		if self.__checkColisionPlayer():
+		if Colision.colisionMobPlayer(self.player,self):
 			return
 		self.currentMobPosX += self.mobVelocity
 
-	def __checkColisionPlayer(self):
-		tempMobRect = self.getRectMob().copy()
-		tempMobRect.y = self.player.getRectPlayer().y
-		#tempMobRect.y = self.settings.valuePosY-self.__rectMob.h
-		if self.player.getRectPlayer().colliderect(tempMobRect):
-			return True
-		if tempMobRect.colliderect(self.player.getRectPlayer()):
-			return True
-		return False
-
-	def checkColisionPlayer(self):
-		return self.__checkColisionPlayer()
-
 	def __updateVelocity(self):
 		#Altera a velocidade para seguir o player
-		if self.__checkColisionPlayer():
+		if Colision.colisionMobPlayer(self.player,self):
 			return
 		if self.player.getPlayerPosX() - self.player.getRectPlayer().w < self.currentMobPosX and self.mobVelocity > 0:
 			self.mobVelocity *= -1
 		elif self.player.getPlayerPosX() + self.player.getRectPlayer().w > self.currentMobPosX and self.mobVelocity < 0:
 			self.mobVelocity *= -1
 
-	@abc.abstractmethod
-	def mobAttack(self):
+	def setDamage(self):
 		pass
