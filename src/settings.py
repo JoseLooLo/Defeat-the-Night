@@ -115,6 +115,7 @@ class Settings:
 			pygame.mixer.init(44100, -16,2,2048)
 			self.sound = pygame.mixer.Sound("data/Sounds/Hurry Starfish.ogg")
 			self.sound.play(-1)
+			self.sound.set_volume(0.2)
 			self.npc0sound = []
 			self.npc1sound = []
 			self.npc2sound = []
