@@ -130,13 +130,13 @@ class Settings:
 			return
 		self.stopSound()
 		if npcID == 0:
-			if len(self.npc0sound) > sound:
+			if len(self.npc0sound) >= sound:
 				self.npc0sound[sound].play()
 		elif npcID == 1:
-			if len(self.npc1sound) > sound:
+			if len(self.npc1sound) >= sound:
 				self.npc1sound[sound].play()
 		elif npcID == 2:
-			if len(self.npc2sound) > sound:
+			if len(self.npc2sound) >= sound:
 				self.npc2sound[sound].play()
 
 	def stopSound(self):
