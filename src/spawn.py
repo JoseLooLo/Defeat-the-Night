@@ -49,6 +49,7 @@ class Spawn:
             del mob
 
     def destroyMob(self, mob):
+        self.player.removeColision()
         self.listMobs.remove(mob)
         self.__createMoney(0,mob.getRectMob().x+mob.getRectMob().w/2,mob.mobMoney)
         del mob

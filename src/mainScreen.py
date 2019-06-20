@@ -33,8 +33,8 @@ class mainScreen(pygame.sprite.Sprite):
         self.__currentImage = self.__images[0]
 
         self.background = self.settings.load_Images("background.png", "Background")
-        self.btnStart = self.settings.load_Images("Start2.png", "Screen/Start", -1)
-        self.btnQuit = self.settings.load_Images("Quit2.png", "Screen/Start", -1)
+        self.btnStart = self.settings.load_Images("Start2.png", "Screen/Start")
+        self.btnQuit = self.settings.load_Images("Quit2.png", "Screen/Start")
 
     def __updateImage(self):
         self.endChangeImage = time.time()
