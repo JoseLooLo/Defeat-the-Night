@@ -91,6 +91,8 @@ class Time(pygame.sprite.Sprite):
     def __setProxTimeMin(self):
         if (self.currentTimeMin+1) == 60:
             self.__setProxTimeHr()
+        self.game.updateAlpha()
+        self.game.updateSpawn()
         self.currentTimeMin = (self.currentTimeMin+1) % 60
 
     def __setProxTimeHr(self):
@@ -118,3 +120,12 @@ class Time(pygame.sprite.Sprite):
         else:
             self.currentTimeHr = 6
             self.currentTimeMin = 59
+
+    def getTimeHr(self):
+        return self.currentTimeHr
+
+    def getTimeMin(self):
+        return self.currentTimeMin
+
+    def getTimeDay(self):
+        return self.currentDay

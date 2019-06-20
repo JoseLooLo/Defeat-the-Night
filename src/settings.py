@@ -113,7 +113,7 @@ class Settings:
 	def __loadSound(self):
 		try:
 			pygame.mixer.init(44100, -16,2,2048)
-			self.sounda= pygame.mixer.Sound("data/Sounds/fala1.ogg")
+			self.sounda = pygame.mixer.Sound("data/Sounds/fala1.ogg")
 		except:
 			print ("Erro ao iniciar o módulo de Som e/ou carregar alguns sons")
 			self.soundEnable = False
@@ -168,9 +168,8 @@ class Settings:
 		self.HUDCoinColor = self.color_green
 
 		self.chatTextColor = self.color_red
-		self.mainBackgroundColor = self.color_black
-		self.mainTextColor = self.color_white
-		self.gameOverTextColor = self.color_red
+		self.endBackgroundColor = self.color_black
+		self.gameOverTextColor = self.color_white
 
 	def __loadBackgroundVariables(self):
 		#A ordem de incersão é importante
@@ -320,6 +319,9 @@ class Settings:
 
 	def getMobNameVector(self):
 		return self.mobName
+
+	def getMobName(self, mobID):
+		return self.mobName[mobID]
 
 	def getMobMoneyDrop(self, mobID):
 		return self.mobMoneyDrop[mobID]

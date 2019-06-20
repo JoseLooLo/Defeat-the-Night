@@ -39,8 +39,11 @@ class Mobs(pygame.sprite.Sprite):
 		self.startChangeImage = time.time()
 		self.endChangeImage = time.time()
 
+		self.startImunityTime = time.time()
+		self.endImunityTime = time.time()
+
 		if self.settings.generalInfo:
-			print ("New Mob ID = %d | posX %d | Dmg %d | Vel %d | HP %d " % (self.mobID, self.currentMobPosX, self.mobDamage, self.mobVelocity, self.mobLife))
+			print ("New Mob %s ID = %d | posX %d | Dmg %d | Vel %d | HP %d " % (self.settings.getMobName(self.mobID),self.mobID, self.currentMobPosX, self.mobDamage, self.mobVelocity, self.mobLife))
 
 	def __loadImages(self):
 		self.__imageMob = []
@@ -111,4 +114,21 @@ class Mobs(pygame.sprite.Sprite):
 			self.mobVelocity *= -1
 
 	def setDamage(self):
-		pass
+		self.endImunityTime = time.time()
+		if self.endImunityTime - self.startImunityTime >= 2:
+			self.startImunityTime = time.time()
+			if self.mobLife - self.player.playerDamage <= 0:
+				self.mobLife = 0
+			else:
+				self.mobLife -= self.player.playerDamage
+
+			if self.settings.generalInfo:
+				print ("Mob Damage %d | Life %d" % (self.player.playerDamage, self.mobLife))
+
+		self.setKnockback()
+
+	def setKnockback(self):
+		if self.mobVelocity > 0:
+			self.currentMobPosX -= 10
+		else:
+			self.currentMobPosX += 10

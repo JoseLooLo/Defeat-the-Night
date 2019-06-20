@@ -106,29 +106,3 @@ class Colision:
             mob.setDamage()
         elif mob.getRectMob().colliderect(tempRectWeapon):
             mob.setDamage()
-
-    # def __checkColisionAtack(self, mob):
-	# 	self.tempMobRect = mob.getRectMob().copy()
-	# 	self.tempWeaponRect = self.weapon.rect.copy()
-	# 	if not self.posMouseRight:
-	# 		self.tempMobRect.x += self.weapon.rect.w
-	# 		self.tempWeaponRect.x = self.rect.x+30
-	# 		self.tempWeaponRect.y = self.rect.y+25
-	# 		if self.tempWeaponRect.colliderect(self.tempMobRect) and mob.mobVelocity > 0:             #Verifica a colisão entre o player e o rect
-	# 			print("Vida atual do mob "+ str(mob.mobLife))
-	# 			print (self.tempWeaponRect)
-	# 			print (self.tempMobRect)
-	# 			self.ifHit = True
-	# 			mob.currentMobPosX -= self.weapon.weaponKnockBack
-	# 			mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)
-	# 	else:
-	# 		self.tempMobRect.x -= self.weapon.rect.w+30
-	# 		self.tempWeaponRect.x = self.rect.x+self.rect.w/2-50
-	# 		self.tempWeaponRect.y = self.rect.y+25
-	# 		if self.tempMobRect.colliderect(self.tempWeaponRect) and mob.mobVelocity < 0:                #Verifica a colisão entre o mod e o player
-	# 			print("Vida atual do mob "+ str(mob.mobLife))
-	# 			print (self.tempWeaponRect)
-	# 			print (self.tempMobRect)
-	# 			self.ifHit = True
-	# 			mob.currentMobPosX += self.weapon.weaponKnockBack
-	# 			mob.mobLife -= (self.damageJogador + self.weapon.weaponDamage)

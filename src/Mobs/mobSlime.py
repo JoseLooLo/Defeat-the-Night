@@ -109,8 +109,17 @@ class mobSlime(Mobs):
                 return
 
     def setDamage(self):
-        pass
-        #print("ol")
+        self.endImunityTime = time.time()
+        if self.endImunityTime - self.startImunityTime >= 2:
+            self.startImunityTime = time.time()
+            if self.mobLife - self.player.playerDamage <= 0:
+                self.mobLife = 0
+            else:
+                self.mobLife -= self.player.playerDamage
+            if self.settings.generalInfo:
+                print ("Mob Damage %d | Life %d" % (self.player.playerDamage, self.mobLife))
+        if not self.inAttack:
+            self.setKnockback()
 
     def draw(self, camera):
         if not self.inAttack:

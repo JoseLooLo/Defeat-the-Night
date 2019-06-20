@@ -22,6 +22,7 @@ class Game:
 		self.settings = settings
 		self.screen = screen
 		self.clockFPS = pygame.time.Clock()
+		self.initGame = True                  #Verifica se está na tela inicial
 
 		self.__init()
 
@@ -35,8 +36,8 @@ class Game:
 	def __loadVariables(self):
 		self.showInformationsPlayer = True    #HUD Player
 		self.showInformationsGame = True      #HUD Game
-		self.initGame = False                  #Verifica se está na tela inicial
 		self.gameOver = False                 #GameOver?
+		self.alpha = 0
 
 	def __createLists(self):
 		#Cria os grupos de sprites
@@ -51,7 +52,7 @@ class Game:
 		self.__createChat()
 
 	def __createCamera(self):
-		self.__camera = Camera(self.settings, self.screen)
+		self.__camera = Camera(self.settings, self, self.screen)
 	
 	def __gameLoop(self):
 		#Loop do jogo
@@ -104,6 +105,8 @@ class Game:
 		if self.player.inAtack:
 			for mob in self.spawn.getMobList().sprites():
 				Colision.colisionWeaponMob(self.player.getWeapon(), mob)
+				if mob.mobLife <= 0:
+					self.spawn.destroyMob(mob)
 		for mob in self.spawn.getMobList().sprites():
 			Colision.colisionPlayerMob(self.player, mob)  #Verifica se encostou no Mob generico
 			
@@ -160,6 +163,30 @@ class Game:
 	def __update(self):
 		self.__updateObject()
 		pygame.display.update()
+
+	def updateSpawn(self):
+		if self.clock.getTimeHr() >= 7 and (self.clock.getTimeHr() <= 16 and self.clock.getTimeHr() == 0):
+			return
+		else:
+			if self.clock.getTimeMin() % 6 == 0:
+				self.spawn.spawn(self.spawn)
+
+	def updateAlpha(self):
+		#Update escuridão do fundo
+		if self.clock.getTimeHr() >= 7 and (self.clock.getTimeHr() <= 16 and self.clock.getTimeHr() == 0):
+			self.alpha = 0
+		else:
+			if self.clock.getTimeHr() >= 16:
+				if self.clock.getTimeMin() % 3 == 0:
+					self.alpha += 1
+			else:
+				if self.alpha == 0:
+					return
+				if self.clock.getTimeMin() % 2 == 0:
+					self.alpha -= 1
+
+	def getAlpha(self):
+		return self.alpha
 
 	def __draw(self):
 		self.__blitAndResetScreen()
@@ -223,7 +250,7 @@ class Game:
 		#Chamado quano uma nova noite começa
 		if self.settings.generalInfo:
 			print("New night")
-		self.spawn.newNight()
+		self.spawn.newNight(self.clock)
 
 	def __createSpritesHUD(self):
 		self.hud = Hud(self.settings, self.clockFPS, self.player, self.__camera)

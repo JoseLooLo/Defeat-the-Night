@@ -1,12 +1,14 @@
 import os, sys
 import pygame
 from src.background import Background
+from src.time import Time
 
 class Camera:
 
-    def __init__(self, settings, screen):
+    def __init__(self, settings, game, screen):
         self.settings = settings
         self.__background = Background(self.settings, self, 0)
+        self.game = game
         self.__screen = screen
 
         self.__init()
@@ -15,6 +17,7 @@ class Camera:
         self.__loadVariables()
 
     def __loadVariables(self):
+        self.backBackground = pygame.Surface((self.settings.screen_width,self.settings.screen_height))
         self.__cameraRect = (0, 0, self.settings.screen_width, self.settings.screen_height)
         # -100 para subir um pouco a camera e não ficar com muito solo aparendo
         tempY = self.__background.getHeightBackground() - self.settings.screen_height
@@ -83,7 +86,14 @@ class Camera:
         self.update()
         self.__screen.blit(self.__background.getBackgroundSurface(), (0,0), self.getCameraRect())
         self.__background.draw()
+        self.backBackground.fill(self.settings.color_black)
+        self.backBackground.set_alpha(self.game.getAlpha())
+        self.__screen.blit(self.backBackground, (0,0))
+
+    def drawScreenEnd(self):
+        self.update()
+        self.__screen.fill(self.settings.endBackgroundColor)
 
     def drawScreenMain(self):
         self.update()
-        self.__screen.fill(self.settings.mainBackgroundColor)
+        self.__screen.fill(self.settings.endBackgroundColor)
