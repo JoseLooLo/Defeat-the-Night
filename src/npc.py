@@ -96,7 +96,7 @@ class Npc(pygame.sprite.Sprite):
         self.__updateWImage()
 
     def __updateNPCImage(self):
-        if (self.time.getIsNight() or self.outOfStock) and self.haveClosed:
+        if self.time.getIsNight() and self.haveClosed:
             self.__setImageNPCClosed()
             return
 
@@ -162,7 +162,7 @@ class Npc(pygame.sprite.Sprite):
 
     def draw(self, camera):
         camera.draw(self.__currentImageNPC, (self.settings.getNPCPosX(self.npcID), self.settings.valuePosY-self.__rectNPC.h))
-        if self.colisionPlayer and not self.time.getIsNight() and not self.outOfStock:
+        if self.colisionPlayer and not self.time.getIsNight():
             camera.draw(self.__currentImageW, (self.settings.getNPCPosX(self.npcID) + (self.__rectNPC.w/2 - self.__rectW.w/2),self.settings.valuePosY-self.__rectNPC.h))
 
     def __checkMarketIsOpen(self):
