@@ -115,9 +115,37 @@ class Settings:
 			pygame.mixer.init(44100, -16,2,2048)
 			self.sound = pygame.mixer.Sound("data/Sounds/Hurry Starfish.ogg")
 			self.sound.play(-1)
+			self.npc0sound = []
+			self.npc1sound = []
+			self.npc2sound = []
+			for _ in range (5):
+				tempS = pygame.mixer.Sound("data/Sounds/NPC/CP_Fala_"+str(i+1)+".ogg")
+				self.npc1sound.append(tempS)
 		except:
 			print ("Erro ao iniciar o módulo de Som e/ou carregar alguns sons")
 			self.soundEnable = False
+
+	def playSoundNPC(self, npcID, sound):
+		if not self.soundEnable:
+			return
+		self.stopSound()
+		if npcID == 0:
+			if len(self.npc0sound) > sound:
+				self.npc0sound[sound].play()
+		elif npcID == 1:
+			if len(self.npc1sound) > sound:
+				self.npc1sound[sound].play()
+		elif npcID == 2:
+			if len(self.npc2sound) > sound:
+				self.npc2sound[sound].play()
+
+	def stopSound(self):
+		for som in self.npc0sound:
+			som.stop()
+		for som in self.npc1sound:
+			som.stop()
+		for som in self.npc2sound:
+			som.stop()
 
 	def __createFont(self):
 		""" Fontes disponíveis"""

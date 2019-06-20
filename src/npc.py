@@ -166,8 +166,6 @@ class Npc(pygame.sprite.Sprite):
             camera.draw(self.__currentImageW, (self.settings.getNPCPosX(self.npcID) + (self.__rectNPC.w/2 - self.__rectW.w/2),self.settings.valuePosY-self.__rectNPC.h))
 
     def __checkMarketIsOpen(self):
-        if self.outOfStock:
-            return False
         if self.time.getIsNight():
             return False
         return True
@@ -184,22 +182,29 @@ class Npc(pygame.sprite.Sprite):
 
     def sellNPCWeapons(self, player):
         self.outOfStock = True
+        if self.outOfStock:
+            self.settings.playSoundNPC(self.npcID, 5)
+            return
 
     def sellNPCHP(self, player):
+        if self.outOfStock:
+            self.settings.playSoundNPC(self.npcID, 5)
+            return
         if player.playerMoney >= self.itemPrice[self.itemIDToday]:
             if self.itemIDToday == 0:
                 player.playerLife += 5
                 player.playerMoney -= self.itemPrice[self.itemIDToday]
                 self.marketQntItensBuyDay+=1
                 self.marketQntItensBuyAll+=1
+                self.settings.playSoundNPC(self.npcID, 2)
                 print("Buy %s | Price %d" % (self.itemName[self.itemIDToday], self.itemPrice[self.itemIDToday]))
         else:
-            if self.settings.soundEnable:
-                pass
-                #self.settings.sounda.play()
+            self.settings.playSoundNPC(self.npcID, 1)
         self.__checkBuyAll()
 
     def sellNPCPotions(self, player):
-        if self.settings.soundEnable:
-            self.settings.sounda.play()
         self.outOfStock = True
+        if self.outOfStock:
+            self.settings.playSoundNPC(self.npcID, 5)
+            return
+        
