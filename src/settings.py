@@ -118,7 +118,7 @@ class Settings:
 			self.npc0sound = []
 			self.npc1sound = []
 			self.npc2sound = []
-			for i in range (5):
+			for i in range (7):
 				tempS = pygame.mixer.Sound("data/Sounds/NPC/CP_Fala_"+str(i+1)+".ogg")
 				self.npc1sound.append(tempS)
 		except:
