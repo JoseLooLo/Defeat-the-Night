@@ -119,7 +119,7 @@ class Settings:
 			self.npc0sound = []
 			self.npc1sound = []
 			self.npc2sound = []
-			for i in range (6):
+			for i in range (5):
 				tempS = pygame.mixer.Sound("data/Sounds/NPC/CP_Fala_"+str(i+1)+".ogg")
 				self.npc1sound.append(tempS)
 		except:
@@ -129,16 +129,17 @@ class Settings:
 	def playSoundNPC(self, npcID, sound):
 		if not self.soundEnable:
 			return
-		self.stopSound()
-		if npcID == 0:
-			if len(self.npc0sound) >= sound:
-				self.npc0sound[sound].play()
-		elif npcID == 1:
-			if len(self.npc1sound) >= sound:
-				self.npc1sound[sound].play()
-		elif npcID == 2:
-			if len(self.npc2sound) >= sound:
-				self.npc2sound[sound].play()
+		return
+		# self.stopSound()
+		# if npcID == 0:
+		# 	if len(self.npc0sound) >= sound:
+		# 		self.npc0sound[sound].play()
+		# elif npcID == 1:
+		# 	if len(self.npc1sound) >= sound:
+		# 		self.npc1sound[sound].play()
+		# elif npcID == 2:
+		# 	if len(self.npc2sound) >= sound:
+		# 		self.npc2sound[sound].play()
 
 	def stopSound(self):
 		for som in self.npc0sound:
